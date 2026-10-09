@@ -1,0 +1,150 @@
+# golangci-lint v2 configuration. The linter binary is pinned in
+# tools/golangci-lint/go.mod and built by tools/install.sh.
+version: "2"
+
+run:
+  timeout: 5m
+  tests: true
+  modules-download-mode: readonly
+
+linters:
+  default: standard # errcheck, govet, ineffassign, staticcheck, unused
+  enable:
+    - bidichk # Trojan Source characters in source files
+    - bodyclose
+    - copyloopvar
+    - depguard
+    - durationcheck
+    - errorlint
+    - forbidigo
+    - gocheckcompilerdirectives
+    - gosec
+    - misspell
+    - nilerr
+    - noctx
+    - nolintlint
+    - sloglint
+    - unconvert
+    - usestdlibvars
+  settings:
+    depguard:
+      rules:
+        safety-invariants:
+          deny:
+            - pkg: "log$"
+              desc: "log through internal/logging (log/slog with mandatory redaction)"
+            - pkg: "os/exec"
+              desc: "no process execution or shell interpolation; provider changes use SDK calls (ADR-0005)"
+            - pkg: "plugin"
+              desc: "never load code at run time; packs are declarative (ADR-0004)"
+            - pkg: "unsafe"
+              desc: "memory-unsafe code requires an ADR"
+            - pkg: "github.com/pkg/errors"
+              desc: "use the standard library errors package"
+        confine-aws-sdk:
+          # Cloud SDKs are confined to their provider adapter under providers/*.
+          # The seam (internal/auth) and the rest of the core stay SDK-free, so
+          # SDK types never reach the model, store, or CLI (ADR-0016 §1, ADR-0017).
+          files:
+            - "$all"
+            - "!**/providers/aws/**"
+          deny:
+            - pkg: "github.com/aws/aws-sdk-go-v2"
+              desc: "the AWS SDK is confined to its adapter in providers/aws (ADR-0016 §1, ADR-0017)"
+            - pkg: "github.com/aws/smithy-go"
+              desc: "the AWS SDK is confined to its adapter in providers/aws (ADR-0016 §1, ADR-0017)"
+        confine-azure-sdk:
+          files:
+            - "$all"
+            - "!**/providers/azure/**"
+          deny:
+            - pkg: "github.com/Azure/azure-sdk-for-go"
+              desc: "the Azure SDK is confined to its adapter in providers/azure (ADR-0016 §1, ADR-0017)"
+        confine-gcp-sdk:
+          files:
+            - "$all"
+            - "!**/providers/gcp/**"
+          deny:
+            - pkg: "google.golang.org/api"
+              desc: "the GCP client libraries are confined to their adapter in providers/gcp (ADR-0016 §1, ADR-0017)"
+            - pkg: "golang.org/x/oauth2"
+              desc: "the GCP OAuth libraries are confined to their adapter in providers/gcp (ADR-0016 §1, ADR-0017)"
+        deterministic-evaluation:
+          # The rule-evaluation package must not import anything that could make a
+          # finding depend on the network or an AI service, the host, randomness, or
+          # the clock (ADR-0021 §4). Belt-and-suspenders beside the AST gate in
+          # internal/rules/deterministic.go, which is itself excluded (it reads source
+          # files by design). Pack loading and signature verification live in
+          # internal/rules/pack and are gated for their own concern.
+          files:
+            - "**/internal/rules/**"
+            - "!**/internal/rules/pack/**"
+            - "!**/internal/rules/deterministic.go"
+          deny:
+            - pkg: "net"
+              desc: "no network in a finding decision (ADR-0021 §4)"
+            - pkg: "net/http"
+              desc: "no HTTP or AI-service client in a finding decision (ADR-0021 §4)"
+            - pkg: "os"
+              desc: "no host or environment access in evaluation (ADR-0021 §4)"
+            - pkg: "math/rand"
+              desc: "no randomness in evaluation; results must be reproducible (ADR-0021 §4)"
+            - pkg: "math/rand/v2"
+              desc: "no randomness in evaluation; results must be reproducible (ADR-0021 §4)"
+            - pkg: "crypto/rand"
+              desc: "no randomness in evaluation; results must be reproducible (ADR-0021 §4)"
+            - pkg: "time"
+              desc: "the wall clock must not enter a finding decision (ADR-0021 §4)"
+        deterministic-graph:
+          # The graph-analysis package (reachability, trust, later paths) must not
+          # import anything that could make a derived edge depend on the network or an
+          # AI service, the host, randomness, or the clock (ADR-0022 §3). Sibling of
+          # deterministic-evaluation; the AST gate in internal/graph/deterministic.go is
+          # itself excluded (it reads source files by design).
+          files:
+            - "**/internal/graph/**"
+            - "!**/internal/graph/deterministic.go"
+          deny:
+            - pkg: "net"
+              desc: "no network in graph analysis (ADR-0022 §3)"
+            - pkg: "net/http"
+              desc: "no HTTP or AI-service client in graph analysis (ADR-0022 §3)"
+            - pkg: "os"
+              desc: "no host or environment access in graph analysis (ADR-0022 §3)"
+            - pkg: "math/rand"
+              desc: "no randomness in graph analysis; results must be reproducible (ADR-0022 §3)"
+            - pkg: "math/rand/v2"
+              desc: "no randomness in graph analysis; results must be reproducible (ADR-0022 §3)"
+            - pkg: "crypto/rand"
+              desc: "no randomness in graph analysis; results must be reproducible (ADR-0022 §3)"
+            - pkg: "time"
+              desc: "the wall clock must not enter a derived edge (ADR-0022 §3)"
+    forbidigo:
+      analyze-types: true
+      forbid:
+        - pattern: '^fmt\.Print(f|ln)?$'
+          msg: "write to an injected io.Writer so output is testable and routable"
+        - pattern: '^print(ln)?$'
+          msg: "write to an injected io.Writer"
+        - pattern: '^os\.(Exit|Getenv|LookupEnv|Environ)$'
+          msg: "only cmd/ittcsecscan/main.go touches process state; inject it elsewhere"
+    errorlint:
+      errorf: true
+    nolintlint:
+      require-explanation: true
+      require-specific: true
+    gosec:
+      excludes: []
+  exclusions:
+    rules:
+      - path: cmd/ittcsecscan/main\.go
+        linters: [forbidigo]
+
+formatters:
+  enable:
+    - gofmt
+    - goimports
+  settings:
+    goimports:
+      local-prefixes:
+        - github.com/ittcsec/ittcsecscan

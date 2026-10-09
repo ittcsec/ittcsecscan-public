@@ -1,0 +1,70 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:ittcsecscan:schema:permissions:template:v1",
+  "title": "ittcsecscan least-privilege permission template",
+  "description": "The read-only permissions ittcsecscan requires for one provider under one profile, and, for each permission, which collectors or rules it enables (ADR-0016 §3). Permission lists are populated by the collectors that declare them, so a template is legitimately empty until then. A template is trusted only after live access-denied verification; until then its verification status is \"unverified\".",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "provider", "profile", "verification", "permissions"],
+  "properties": {
+    "schema_version": { "const": "permissions.v1" },
+    "provider": { "enum": ["aws", "azure", "gcp", "github", "gitlab", "kubernetes", "okta", "google_workspace", "mcp"] },
+    "profile": {
+      "description": "The least-privilege profile (ADR-0005): discovery and deep-evidence are read-only; remediation is separate and never the default.",
+      "enum": ["discovery", "deep-evidence", "remediation"]
+    },
+    "verification": {
+      "description": "The verification status of the template as a whole. Verified only when every permission has passed live access-denied verification against a real, disposable test account (ADR-0016 §3).",
+      "$ref": "#/$defs/verification"
+    },
+    "permissions": {
+      "description": "The permissions this profile grants. Empty until collectors declare their needs.",
+      "type": "array",
+      "items": { "$ref": "#/$defs/entry" }
+    }
+  },
+  "$defs": {
+    "verification": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["status"],
+      "properties": {
+        "status": { "enum": ["unverified", "verified"] },
+        "date": {
+          "description": "When the live verification was run.",
+          "type": "string",
+          "format": "date-time"
+        },
+        "method": {
+          "description": "How it was verified, for example the maintainer-run live harness test name.",
+          "type": "string",
+          "minLength": 1
+        }
+      },
+      "if": { "properties": { "status": { "const": "verified" } } },
+      "then": {
+        "description": "A verified entry must carry evidence: nothing is trusted on the word 'verified' alone.",
+        "required": ["status", "date", "method"]
+      }
+    },
+    "entry": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["permission", "enabled_by", "verification"],
+      "properties": {
+        "permission": {
+          "description": "The provider-native permission identifier: an AWS IAM action, an Azure RBAC action, or a GCP permission.",
+          "type": "string",
+          "minLength": 1
+        },
+        "enabled_by": {
+          "description": "The collectors or rules that require this permission. A permission with no justification is not least-privilege, so at least one is required.",
+          "type": "array",
+          "minItems": 1,
+          "items": { "type": "string", "minLength": 1 }
+        },
+        "verification": { "$ref": "#/$defs/verification" }
+      }
+    }
+  }
+}

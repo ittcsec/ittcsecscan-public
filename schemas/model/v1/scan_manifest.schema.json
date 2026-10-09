@@ -1,0 +1,31 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:ittcsecscan:schema:model:scan_manifest:v1",
+  "title": "Canonical scan manifest",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "tool_version", "started_at", "status", "scopes"],
+  "properties": {
+    "schema_version": { "$ref": "urn:ittcsecscan:schema:model:common:v1#/$defs/schema_version" },
+    "tool_version": { "type": "string" },
+    "started_at": { "$ref": "urn:ittcsecscan:schema:model:common:v1#/$defs/timestamp" },
+    "completed_at": { "$ref": "urn:ittcsecscan:schema:model:common:v1#/$defs/timestamp" },
+    "status": { "$ref": "urn:ittcsecscan:schema:model:common:v1#/$defs/scan_status" },
+    "scopes": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["provider", "account", "requested", "observed", "completeness"],
+        "properties": {
+          "provider": { "$ref": "urn:ittcsecscan:schema:model:common:v1#/$defs/provider" },
+          "account": { "type": "string" },
+          "region": { "type": "string" },
+          "requested": { "type": "integer", "minimum": 0 },
+          "observed": { "type": "integer", "minimum": 0 },
+          "completeness": { "$ref": "urn:ittcsecscan:schema:model:common:v1#/$defs/completeness" }
+        }
+      }
+    }
+  }
+}

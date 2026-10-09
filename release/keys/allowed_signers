@@ -1,0 +1,9 @@
+# ittcsecscan release signing trust root (ADR-0009).
+#
+# Every release's SHA256SUMS.sig must be an OpenSSH signature, in the namespace
+# ittcsecscan-release, by a key below. Each entry is limited to that
+# namespace. Changes need a signed pull request to main.
+#
+# Key: dedicated Ed25519 release key, created 2026-09-11, held offline by the maintainer.
+# Fingerprint: SHA256:GCFDRVCPT+1rEnF9ax7KhG1TWiyS282ZHGYBKX/BMyM
+ittcsecscan-release namespaces="ittcsecscan-release" ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIGkbnOrB4CUN78MAE1eweTgrHVMAUO9n3YiUtLoBEOEr ittcsecscan release signing key

@@ -1,0 +1,53 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:ittcsecscan:schema:cli:doctor:v1",
+  "title": "ittcsecscan doctor --json output",
+  "description": "Result of local environment health checks. A check that cannot be evaluated is \"unknown\" and is never counted as a pass.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "overall", "strict", "summary", "checks"],
+  "properties": {
+    "schema_version": { "const": 1 },
+    "overall": {
+      "description": "fail if any check failed; otherwise warn if any check warned or was unknown; otherwise pass.",
+      "enum": ["pass", "warn", "fail"]
+    },
+    "strict": {
+      "description": "True when --strict was given: warn and unknown also produce a failing exit code.",
+      "type": "boolean"
+    },
+    "summary": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["pass", "warn", "fail", "unknown"],
+      "properties": {
+        "pass": { "type": "integer", "minimum": 0 },
+        "warn": { "type": "integer", "minimum": 0 },
+        "fail": { "type": "integer", "minimum": 0 },
+        "unknown": { "type": "integer", "minimum": 0 }
+      }
+    },
+    "checks": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/check" }
+    }
+  },
+  "$defs": {
+    "check": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "title", "status", "detail"],
+      "properties": {
+        "id": {
+          "description": "Stable dotted identifier. Never renamed once released.",
+          "type": "string",
+          "pattern": "^[a-z][a-z0-9_]*(\\.[a-z][a-z0-9_]*)+$"
+        },
+        "title": { "type": "string", "minLength": 1 },
+        "status": { "enum": ["pass", "warn", "fail", "unknown"] },
+        "detail": { "type": "string" },
+        "remediation": { "type": "string" }
+      }
+    }
+  }
+}

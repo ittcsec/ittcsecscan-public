@@ -1,0 +1,18 @@
+{
+  "id": "CORE-P0-STORAGE-PUBLIC-AWS",
+  "version": "1",
+  "pack_id": "core-p0",
+  "severity": "high",
+  "title": "S3 bucket is publicly accessible",
+  "detail": "The bucket policy grants public access, or its ACL grants access to all users. Public buckets expose their objects to anyone on the internet.",
+  "selector": { "node_type": "data_store", "predicate": { "op": "fact_absent", "fact": "engine" } },
+  "predicate": { "op": "or", "children": [
+    { "op": "fact_equals", "fact": "policy_is_public", "value": "true" },
+    { "op": "fact_present", "fact": "acl_all_users" }
+  ] },
+  "requires": { "nodes": ["data_store"], "completeness": ["s3.bucketConfig"] },
+  "confidence": { "base": 80, "factors": [
+    { "name": "provider_policy_is_public", "when": { "op": "fact_equals", "fact": "policy_is_public", "value": "true" }, "delta": 15 },
+    { "name": "acl_all_users", "when": { "op": "fact_present", "fact": "acl_all_users" }, "delta": 5 }
+  ] }
+}

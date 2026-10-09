@@ -1,0 +1,1 @@
+detection pack manifest v1 test payload

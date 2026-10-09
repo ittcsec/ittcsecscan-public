@@ -1,0 +1,373 @@
+{
+  "schema_version": "permissions.v1",
+  "provider": "aws",
+  "profile": "discovery",
+  "verification": { "status": "unverified" },
+  "permissions": [
+    {
+      "permission": "iam:GetAccountAuthorizationDetails",
+      "enabled_by": ["collector:aws.iam.identities"],
+      "verification": { "status": "unverified" }
+    },
+    {
+      "permission": "iam:ListAccountAliases",
+      "enabled_by": ["collector:aws.iam.identities"],
+      "verification": { "status": "unverified" }
+    },
+    {
+      "permission": "iam:GenerateCredentialReport",
+      "enabled_by": ["collector:aws.iam.credentialReport"],
+      "verification": { "status": "unverified" }
+    },
+    {
+      "permission": "iam:GetCredentialReport",
+      "enabled_by": ["collector:aws.iam.credentialReport"],
+      "verification": { "status": "unverified" }
+    },
+    {
+      "permission": "s3:ListAllMyBuckets",
+      "enabled_by": ["collector:aws.s3.buckets"],
+      "verification": { "status": "unverified" }
+    },
+    {
+      "permission": "s3:GetBucketLocation",
+      "enabled_by": ["collector:aws.s3.buckets"],
+      "verification": { "status": "unverified" }
+    },
+    {
+      "permission": "s3:GetBucketPublicAccessBlock",
+      "enabled_by": ["collector:aws.s3.buckets"],
+      "verification": { "status": "unverified" }
+    },
+    {
+      "permission": "s3:GetBucketPolicyStatus",
+      "enabled_by": ["collector:aws.s3.buckets"],
+      "verification": { "status": "unverified" }
+    },
+    {
+      "permission": "s3:GetBucketAcl",
+      "enabled_by": ["collector:aws.s3.buckets"],
+      "verification": { "status": "unverified" }
+    },
+    {
+      "permission": "s3:GetEncryptionConfiguration",
+      "enabled_by": ["collector:aws.s3.buckets"],
+      "verification": { "status": "unverified" }
+    },
+    {
+      "permission": "s3:GetBucketVersioning",
+      "enabled_by": ["collector:aws.s3.buckets"],
+      "verification": { "status": "unverified" }
+    },
+    {
+      "permission": "s3:GetBucketTagging",
+      "enabled_by": ["collector:aws.s3.buckets"],
+      "verification": { "status": "unverified" }
+    },
+    {
+      "permission": "s3:ListAccessPoints",
+      "enabled_by": ["collector:aws.s3.accessPoints"],
+      "verification": { "status": "unverified" }
+    },
+    {
+      "permission": "s3:GetAccessPointPolicyStatus",
+      "enabled_by": ["collector:aws.s3.accessPoints"],
+      "verification": { "status": "unverified" }
+    },
+    {
+      "permission": "s3:GetAccessPointPolicy",
+      "enabled_by": ["collector:aws.s3.accessPoints"],
+      "verification": { "status": "unverified" }
+    },
+    {
+      "permission": "ec2:DescribeRegions",
+      "enabled_by": ["collector:aws.s3.accessPoints"],
+      "verification": { "status": "unverified" }
+    },
+    {
+      "permission": "ec2:DescribeInstances",
+      "enabled_by": ["collector:aws.ec2.instances"],
+      "verification": { "status": "unverified" }
+    },
+    {
+      "permission": "ec2:DescribeVpcEndpoints",
+      "enabled_by": ["collector:aws.ec2.vpcEndpoints"],
+      "verification": { "status": "unverified" }
+    },
+    {
+      "permission": "ec2:DescribeSnapshots",
+      "enabled_by": ["collector:aws.ec2.ebsSnapshots"],
+      "verification": { "status": "unverified" }
+    },
+    {
+      "permission": "ec2:DescribeSnapshotAttribute",
+      "enabled_by": ["collector:aws.ec2.ebsSnapshots"],
+      "verification": { "status": "unverified" }
+    },
+    {
+      "permission": "lambda:ListFunctions",
+      "enabled_by": ["collector:aws.lambda.functions"],
+      "verification": { "status": "unverified" }
+    },
+    {
+      "permission": "lambda:ListFunctionUrlConfigs",
+      "enabled_by": ["collector:aws.lambda.functions"],
+      "verification": { "status": "unverified" }
+    },
+    {
+      "permission": "lambda:GetPolicy",
+      "enabled_by": ["collector:aws.lambda.functions"],
+      "verification": { "status": "unverified" }
+    },
+    {
+      "permission": "iam:GetInstanceProfile",
+      "enabled_by": ["collector:aws.ec2.instances"],
+      "verification": { "status": "unverified" }
+    },
+    {
+      "permission": "ec2:DescribeVpcs",
+      "enabled_by": ["collector:aws.ec2.network"],
+      "verification": { "status": "unverified" }
+    },
+    {
+      "permission": "ec2:DescribeSubnets",
+      "enabled_by": ["collector:aws.ec2.network"],
+      "verification": { "status": "unverified" }
+    },
+    {
+      "permission": "ec2:DescribeRouteTables",
+      "enabled_by": ["collector:aws.ec2.network"],
+      "verification": { "status": "unverified" }
+    },
+    {
+      "permission": "ec2:DescribeInternetGateways",
+      "enabled_by": ["collector:aws.ec2.network"],
+      "verification": { "status": "unverified" }
+    },
+    {
+      "permission": "ec2:DescribeEgressOnlyInternetGateways",
+      "enabled_by": ["collector:aws.ec2.network"],
+      "verification": { "status": "unverified" }
+    },
+    {
+      "permission": "ec2:DescribeNatGateways",
+      "enabled_by": ["collector:aws.ec2.network"],
+      "verification": { "status": "unverified" }
+    },
+    {
+      "permission": "ec2:DescribeSecurityGroups",
+      "enabled_by": ["collector:aws.ec2.network"],
+      "verification": { "status": "unverified" }
+    },
+    {
+      "permission": "ec2:DescribeNetworkAcls",
+      "enabled_by": ["collector:aws.ec2.network"],
+      "verification": { "status": "unverified" }
+    },
+    {
+      "permission": "ec2:DescribeNetworkInterfaces",
+      "enabled_by": ["collector:aws.ec2.network"],
+      "verification": { "status": "unverified" }
+    },
+    {
+      "permission": "ec2:DescribeAddresses",
+      "enabled_by": ["collector:aws.ec2.network"],
+      "verification": { "status": "unverified" }
+    },
+    {
+      "permission": "rds:DescribeDBInstances",
+      "enabled_by": ["collector:aws.rds"],
+      "verification": { "status": "unverified" }
+    },
+    {
+      "permission": "rds:DescribeDBClusters",
+      "enabled_by": ["collector:aws.rds"],
+      "verification": { "status": "unverified" }
+    },
+    {
+      "permission": "rds:DescribeDBSnapshots",
+      "enabled_by": ["collector:aws.rds"],
+      "verification": { "status": "unverified" }
+    },
+    {
+      "permission": "rds:DescribeDBSnapshotAttributes",
+      "enabled_by": ["collector:aws.rds"],
+      "verification": { "status": "unverified" }
+    },
+    {
+      "permission": "rds:DescribeDBClusterSnapshots",
+      "enabled_by": ["collector:aws.rds"],
+      "verification": { "status": "unverified" }
+    },
+    {
+      "permission": "rds:DescribeDBClusterSnapshotAttributes",
+      "enabled_by": ["collector:aws.rds"],
+      "verification": { "status": "unverified" }
+    },
+    {
+      "permission": "kms:ListAliases",
+      "enabled_by": ["collector:aws.kms"],
+      "verification": { "status": "unverified" }
+    },
+    {
+      "permission": "kms:ListKeys",
+      "enabled_by": ["collector:aws.kms"],
+      "verification": { "status": "unverified" }
+    },
+    {
+      "permission": "kms:DescribeKey",
+      "enabled_by": ["collector:aws.kms"],
+      "verification": { "status": "unverified" }
+    },
+    {
+      "permission": "kms:GetKeyPolicy",
+      "enabled_by": ["collector:aws.kms"],
+      "verification": { "status": "unverified" }
+    },
+    {
+      "permission": "kms:GetKeyRotationStatus",
+      "enabled_by": ["collector:aws.kms"],
+      "verification": { "status": "unverified" }
+    },
+    {
+      "permission": "kms:ListResourceTags",
+      "enabled_by": ["collector:aws.kms"],
+      "verification": { "status": "unverified" }
+    },
+    {
+      "permission": "cloudtrail:DescribeTrails",
+      "enabled_by": ["collector:aws.logging"],
+      "verification": { "status": "unverified" }
+    },
+    {
+      "permission": "cloudtrail:GetTrailStatus",
+      "enabled_by": ["collector:aws.logging"],
+      "verification": { "status": "unverified" }
+    },
+    {
+      "permission": "cloudtrail:GetEventSelectors",
+      "enabled_by": ["collector:aws.logging"],
+      "verification": { "status": "unverified" }
+    },
+    {
+      "permission": "config:DescribeConfigurationRecorders",
+      "enabled_by": ["collector:aws.logging"],
+      "verification": { "status": "unverified" }
+    },
+    {
+      "permission": "config:DescribeConfigurationRecorderStatus",
+      "enabled_by": ["collector:aws.logging"],
+      "verification": { "status": "unverified" }
+    },
+    {
+      "permission": "config:DescribeDeliveryChannels",
+      "enabled_by": ["collector:aws.logging"],
+      "verification": { "status": "unverified" }
+    },
+    {
+      "permission": "guardduty:ListDetectors",
+      "enabled_by": ["collector:aws.securityservices"],
+      "verification": { "status": "unverified" }
+    },
+    {
+      "permission": "guardduty:GetDetector",
+      "enabled_by": ["collector:aws.securityservices"],
+      "verification": { "status": "unverified" }
+    },
+    {
+      "permission": "securityhub:DescribeHub",
+      "enabled_by": ["collector:aws.securityservices"],
+      "verification": { "status": "unverified" }
+    },
+    {
+      "permission": "securityhub:GetEnabledStandards",
+      "enabled_by": ["collector:aws.securityservices"],
+      "verification": { "status": "unverified" }
+    },
+    {
+      "permission": "access-analyzer:ListAnalyzers",
+      "enabled_by": ["collector:aws.securityservices"],
+      "verification": { "status": "unverified" }
+    },
+    {
+      "permission": "inspector2:BatchGetAccountStatus",
+      "enabled_by": ["collector:aws.securityservices"],
+      "verification": { "status": "unverified" }
+    },
+    {
+      "permission": "macie2:GetMacieSession",
+      "enabled_by": ["collector:aws.securityservices"],
+      "verification": { "status": "unverified" }
+    },
+    {
+      "permission": "organizations:DescribeOrganization",
+      "enabled_by": ["collector:aws.organizations"],
+      "verification": { "status": "unverified" }
+    },
+    {
+      "permission": "organizations:ListRoots",
+      "enabled_by": ["collector:aws.organizations"],
+      "verification": { "status": "unverified" }
+    },
+    {
+      "permission": "organizations:ListOrganizationalUnitsForParent",
+      "enabled_by": ["collector:aws.organizations"],
+      "verification": { "status": "unverified" }
+    },
+    {
+      "permission": "organizations:ListAccountsForParent",
+      "enabled_by": ["collector:aws.organizations"],
+      "verification": { "status": "unverified" }
+    },
+    {
+      "permission": "organizations:ListPolicies",
+      "enabled_by": ["collector:aws.organizations"],
+      "verification": { "status": "unverified" }
+    },
+    {
+      "permission": "organizations:DescribePolicy",
+      "enabled_by": ["collector:aws.organizations"],
+      "verification": { "status": "unverified" }
+    },
+    {
+      "permission": "organizations:ListTargetsForPolicy",
+      "enabled_by": ["collector:aws.organizations"],
+      "verification": { "status": "unverified" }
+    },
+    {
+      "permission": "bedrock:ListAgents",
+      "enabled_by": ["collector:aws.bedrock.agents"],
+      "verification": { "status": "unverified" }
+    },
+    {
+      "permission": "bedrock:GetAgent",
+      "enabled_by": ["collector:aws.bedrock.agents"],
+      "verification": { "status": "unverified" }
+    },
+    {
+      "permission": "bedrock:ListAgentActionGroups",
+      "enabled_by": ["collector:aws.bedrock.agents"],
+      "verification": { "status": "unverified" }
+    },
+    {
+      "permission": "bedrock:GetAgentActionGroup",
+      "enabled_by": ["collector:aws.bedrock.agents"],
+      "verification": { "status": "unverified" }
+    },
+    {
+      "permission": "bedrock:ListAgentKnowledgeBases",
+      "enabled_by": ["collector:aws.bedrock.agents"],
+      "verification": { "status": "unverified" }
+    },
+    {
+      "permission": "bedrock:ListDataSources",
+      "enabled_by": ["collector:aws.bedrock.agents"],
+      "verification": { "status": "unverified" }
+    },
+    {
+      "permission": "bedrock:GetDataSource",
+      "enabled_by": ["collector:aws.bedrock.agents"],
+      "verification": { "status": "unverified" }
+    }
+  ]
+}

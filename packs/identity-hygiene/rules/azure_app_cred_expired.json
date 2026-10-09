@@ -1,0 +1,19 @@
+{
+  "id": "IDH-AZURE-APP-CRED-EXPIRED",
+  "version": "1",
+  "pack_id": "identity-hygiene",
+  "severity": "low",
+  "title": "App registration credential expired or expiring",
+  "detail": "An Entra application registration credential (certificate or client secret) has expired, or expires within 30 days. An expired credential is dead weight that should be removed; a near-expiry credential is an operational and rotation-hygiene signal. The 30-day window lives in this signed rule. A credential with no end date is reported not assessed, never passed.",
+  "selector": { "node_type": "credential", "predicate": { "op": "fact_equals", "fact": "azure_type", "value": "app_credential" } },
+  "indeterminate": { "op": "not", "children": [ { "op": "fact_present", "fact": "expired" } ] },
+  "predicate": { "op": "or", "children": [
+    { "op": "fact_equals", "fact": "expired", "value": "true" },
+    { "op": "and", "children": [
+      { "op": "fact_num", "fact": "days_until_expiry", "cmp": "ge", "value": "0" },
+      { "op": "fact_num", "fact": "days_until_expiry", "cmp": "lt", "value": "30" }
+    ] }
+  ] },
+  "requires": { "nodes": ["credential"], "completeness": ["entra.appCredentials"] },
+  "confidence": { "base": 70 }
+}

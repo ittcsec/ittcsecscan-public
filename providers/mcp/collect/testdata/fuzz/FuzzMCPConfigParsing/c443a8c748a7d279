@@ -1,0 +1,2 @@
+go test fuzz v1
+string("{\"mCpServers\":{\"0\":{\"url\":\"//0sek\"}}}")

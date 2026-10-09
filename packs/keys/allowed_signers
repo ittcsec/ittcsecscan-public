@@ -1,0 +1,20 @@
+# ittcsecscan built-in detection pack trust root (ADR-0021 section 2).
+#
+# Each built-in pack's manifest.json.sig must be an OpenSSH signature, in the namespace
+# ittcsecscan-pack, by a key listed below. Each entry is limited to that namespace and uses
+# the principal "ittcsecscan-pack", mirroring release/keys/allowed_signers (ADR-0009).
+# Changes need a signed pull request to main.
+#
+# While no key is listed here, built-in packs are trusted through the binary's own release
+# signature (ADR-0009) and load without a per-pack signature (the interim state).
+# The moment a key is listed, pack.LoadBuiltinAll requires every built-in pack to carry a
+# valid signature, and an unsigned, tampered, wrong-key, or wrong-namespace pack is refused
+# (fail closed). See "Signing the built-in packs" in packs/README.md for the one-time
+# offline ceremony.
+#
+# To embed the first-party pack key, add exactly one line below of the form:
+#
+#   ittcsecscan-pack namespaces="ittcsecscan-pack" ssh-ed25519 <BASE64-PUBLIC-KEY> ittcsecscan pack signing key
+#
+# (no key embedded yet)
+ittcsecscan-pack namespaces="ittcsecscan-pack" ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIIZaiDCbiQ/w9YHBuyO0Je4Mz0GufvYs4j5yqfiKNT+j ittcsecscan pack signing key

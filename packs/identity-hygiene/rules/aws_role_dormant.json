@@ -1,0 +1,22 @@
+{
+  "id": "IDH-AWS-ROLE-DORMANT",
+  "version": "1",
+  "pack_id": "identity-hygiene",
+  "severity": "medium",
+  "title": "IAM role is dormant",
+  "detail": "An IAM role has had no activity in the IAM last-used tracking window, or was last used over 90 days ago. AWS tracks role activity only for the trailing 400 days per Region, so a role reported with no activity may have been used earlier or never; either way it is a candidate for removal. Service-linked roles (managed by an AWS service) are excluded. The 90-day threshold lives in this signed rule.",
+  "selector": { "node_type": "role", "predicate": { "op": "and", "children": [
+    { "op": "fact_present", "fact": "role_last_used" },
+    { "op": "not", "children": [ { "op": "fact_equals", "fact": "service_linked", "value": "true" } ] }
+  ] } },
+  "indeterminate": { "op": "and", "children": [
+    { "op": "not", "children": [ { "op": "fact_equals", "fact": "role_last_used", "value": "never" } ] },
+    { "op": "not", "children": [ { "op": "fact_num", "fact": "role_last_used_age_days", "cmp": "ge", "value": "0" } ] }
+  ] },
+  "predicate": { "op": "or", "children": [
+    { "op": "fact_equals", "fact": "role_last_used", "value": "never" },
+    { "op": "fact_num", "fact": "role_last_used_age_days", "cmp": "gt", "value": "90" }
+  ] },
+  "requires": { "nodes": ["role"], "completeness": ["iam.identities"] },
+  "confidence": { "base": 70 }
+}

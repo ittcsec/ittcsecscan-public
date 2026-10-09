@@ -1,0 +1,7 @@
+{
+  "schema_version": "permissions.v1",
+  "provider": "kubernetes",
+  "profile": "remediation",
+  "verification": { "status": "unverified" },
+  "permissions": []
+}

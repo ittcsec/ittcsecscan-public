@@ -1,0 +1,12 @@
+{
+  "id": "CORE-P0-DATABASE-PUBLIC-AWS",
+  "version": "1",
+  "pack_id": "core-p0",
+  "severity": "high",
+  "title": "RDS database is publicly accessible",
+  "detail": "The RDS instance or cluster has PubliclyAccessible set, so it is assigned a public endpoint reachable from the internet (subject to its security groups).",
+  "selector": { "node_type": "data_store", "predicate": { "op": "fact_present", "fact": "publicly_accessible" } },
+  "predicate": { "op": "fact_equals", "fact": "publicly_accessible", "value": "true" },
+  "requires": { "nodes": ["data_store"], "completeness": ["rds.dbInstances"] },
+  "confidence": { "base": 85 }
+}

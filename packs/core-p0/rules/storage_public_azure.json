@@ -1,0 +1,12 @@
+{
+  "id": "CORE-P0-STORAGE-PUBLIC-AZURE",
+  "version": "1",
+  "pack_id": "core-p0",
+  "severity": "high",
+  "title": "Storage account allows public blob access",
+  "detail": "The storage account has allow-blob-public-access enabled, so containers configured for public access expose their blobs to anonymous callers.",
+  "selector": { "node_type": "data_store", "predicate": { "op": "fact_equals", "fact": "azure_type", "value": "storage_account" } },
+  "predicate": { "op": "fact_equals", "fact": "allow_blob_public_access", "value": "true" },
+  "requires": { "nodes": ["data_store"], "completeness": ["storage.accounts"] },
+  "confidence": { "base": 85 }
+}

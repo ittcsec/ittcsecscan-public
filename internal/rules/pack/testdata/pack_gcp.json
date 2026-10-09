@@ -1,0 +1,437 @@
+[
+  {
+    "rule": {
+      "rule_id": "CORE-P0-COMPUTE-INTERNET-EXPOSED-AWS",
+      "version": "1",
+      "pack_id": "core-p0"
+    },
+    "entity_id": "",
+    "state": "not_applicable",
+    "confidence": 0,
+    "confidence_basis": [
+      "ec2.instances:absent",
+      "ec2.networkAcls:absent",
+      "ec2.securityGroups:absent"
+    ],
+    "grounding": {
+      "completeness": [
+        "ec2.instances:absent",
+        "ec2.networkAcls:absent",
+        "ec2.securityGroups:absent"
+      ]
+    },
+    "trace": [
+      "not assessed: required evidence incomplete (ec2.instances:absent, ec2.networkAcls:absent, ec2.securityGroups:absent)"
+    ],
+    "detail": "A security group allows an internet source (0.0.0.0/0 or ::/0) across all ports and no network ACL denies it, so an internet source can reach the instance on every port at the network layer. This is configuration exposure derived from the collected rules, not verified reachability."
+  },
+  {
+    "rule": {
+      "rule_id": "CORE-P0-COMPUTE-INTERNET-EXPOSED-AZURE",
+      "version": "1",
+      "pack_id": "core-p0"
+    },
+    "entity_id": "",
+    "state": "not_applicable",
+    "confidence": 0,
+    "confidence_basis": [
+      "compute.virtualMachines:absent",
+      "network.networkInterfaces:absent",
+      "network.networkSecurityGroups:absent",
+      "network.publicIPAddresses:absent",
+      "network.virtualNetworks:absent"
+    ],
+    "grounding": {
+      "completeness": [
+        "compute.virtualMachines:absent",
+        "network.networkInterfaces:absent",
+        "network.networkSecurityGroups:absent",
+        "network.publicIPAddresses:absent",
+        "network.virtualNetworks:absent"
+      ]
+    },
+    "trace": [
+      "not assessed: required evidence incomplete (compute.virtualMachines:absent, network.networkInterfaces:absent, network.networkSecurityGroups:absent, network.publicIPAddresses:absent, network.virtualNetworks:absent)"
+    ],
+    "detail": "A network security group allows an internet source across all ports, or the virtual machine has a Basic SKU public IP with no network security group (open by default). An internet source can therefore reach the machine on every port at the network layer. This is configuration exposure derived from the collected rules, not verified reachability."
+  },
+  {
+    "rule": {
+      "rule_id": "CORE-P0-COMPUTE-INTERNET-EXPOSED-GCP",
+      "version": "1",
+      "pack_id": "core-p0"
+    },
+    "entity_id": "",
+    "state": "not_applicable",
+    "confidence": 0,
+    "confidence_basis": [
+      "compute.firewalls:absent",
+      "compute.instances:absent"
+    ],
+    "grounding": {
+      "completeness": [
+        "compute.firewalls:absent",
+        "compute.instances:absent"
+      ]
+    },
+    "trace": [
+      "not assessed: required evidence incomplete (compute.firewalls:absent, compute.instances:absent)"
+    ],
+    "detail": "An ingress firewall rule allows an internet source (0.0.0.0/0) across all ports on the instance's network, and no higher priority rule denies it, so an internet source can reach the instance on every port at the network layer. This is configuration exposure derived from the collected rules, not verified reachability."
+  },
+  {
+    "rule": {
+      "rule_id": "CORE-P0-DATABASE-PUBLIC-AWS",
+      "version": "1",
+      "pack_id": "core-p0"
+    },
+    "entity_id": "",
+    "state": "not_applicable",
+    "confidence": 0,
+    "confidence_basis": [
+      "rds.dbInstances:absent"
+    ],
+    "grounding": {
+      "completeness": [
+        "rds.dbInstances:absent"
+      ]
+    },
+    "trace": [
+      "not assessed: required evidence incomplete (rds.dbInstances:absent)"
+    ],
+    "detail": "The RDS instance or cluster has PubliclyAccessible set, so it is assigned a public endpoint reachable from the internet (subject to its security groups)."
+  },
+  {
+    "rule": {
+      "rule_id": "CORE-P0-DATABASE-PUBLIC-AZURE",
+      "version": "1",
+      "pack_id": "core-p0"
+    },
+    "entity_id": "",
+    "state": "not_applicable",
+    "confidence": 0,
+    "confidence_basis": [
+      "database.cosmosAccounts:absent",
+      "database.mysqlServers:absent",
+      "database.postgresqlServers:absent",
+      "database.sqlServers:absent"
+    ],
+    "grounding": {
+      "completeness": [
+        "database.cosmosAccounts:absent",
+        "database.mysqlServers:absent",
+        "database.postgresqlServers:absent",
+        "database.sqlServers:absent"
+      ]
+    },
+    "trace": [
+      "not assessed: required evidence incomplete (database.cosmosAccounts:absent, database.mysqlServers:absent, database.postgresqlServers:absent, database.sqlServers:absent)"
+    ],
+    "detail": "The Azure SQL, PostgreSQL, MySQL, or Cosmos database has public network access enabled, exposing its endpoint to the public internet."
+  },
+  {
+    "rule": {
+      "rule_id": "CORE-P0-DATABASE-PUBLIC-GCP",
+      "version": "1",
+      "pack_id": "core-p0"
+    },
+    "entity_id": "//cloudsql.googleapis.com/projects/p/instances/open",
+    "entity_type": "data_store",
+    "state": "fail",
+    "confidence": 90,
+    "confidence_basis": [
+      "base(90)"
+    ],
+    "grounding": {
+      "nodes": [
+        "//cloudsql.googleapis.com/projects/p/instances/open"
+      ],
+      "facts": [
+        "public_ip_enabled=true on //cloudsql.googleapis.com/projects/p/instances/open",
+        "authorized_networks=0.0.0.0/0 on //cloudsql.googleapis.com/projects/p/instances/open"
+      ],
+      "completeness": [
+        "cloudsql.instances:complete"
+      ]
+    },
+    "trace": [
+      "data_store //cloudsql.googleapis.com/projects/p/instances/open: fact public_ip_enabled=\"true\"",
+      "data_store //cloudsql.googleapis.com/projects/p/instances/open: fact authorized_networks=\"0.0.0.0/0\""
+    ],
+    "detail": "The Cloud SQL instance has a public IP and an authorized-network entry of 0.0.0.0/0, so it accepts connections from any address on the internet."
+  },
+  {
+    "rule": {
+      "rule_id": "CORE-P0-DATABASE-PUBLIC-GCP",
+      "version": "1",
+      "pack_id": "core-p0"
+    },
+    "entity_id": "//cloudsql.googleapis.com/projects/p/instances/scoped",
+    "entity_type": "data_store",
+    "state": "pass",
+    "confidence": 90,
+    "confidence_basis": [
+      "base(90)"
+    ],
+    "grounding": {
+      "nodes": [
+        "//cloudsql.googleapis.com/projects/p/instances/scoped"
+      ],
+      "facts": [
+        "public_ip_enabled=true on //cloudsql.googleapis.com/projects/p/instances/scoped"
+      ],
+      "completeness": [
+        "cloudsql.instances:complete"
+      ]
+    },
+    "trace": [
+      "data_store //cloudsql.googleapis.com/projects/p/instances/scoped: fact public_ip_enabled=\"true\""
+    ],
+    "detail": "The Cloud SQL instance has a public IP and an authorized-network entry of 0.0.0.0/0, so it accepts connections from any address on the internet."
+  },
+  {
+    "rule": {
+      "rule_id": "CORE-P0-KEYVAULT-PURGE-AZURE",
+      "version": "1",
+      "pack_id": "core-p0"
+    },
+    "entity_id": "",
+    "state": "not_applicable",
+    "confidence": 0,
+    "confidence_basis": [
+      "keyvault.vaults:absent"
+    ],
+    "grounding": {
+      "completeness": [
+        "keyvault.vaults:absent"
+      ]
+    },
+    "trace": [
+      "not assessed: required evidence incomplete (keyvault.vaults:absent)"
+    ],
+    "detail": "The key vault does not have purge protection enabled, so a deleted vault or key can be permanently purged within the retention window, defeating recovery."
+  },
+  {
+    "rule": {
+      "rule_id": "CORE-P0-KMS-ROTATION-AWS",
+      "version": "1",
+      "pack_id": "core-p0"
+    },
+    "entity_id": "",
+    "state": "not_applicable",
+    "confidence": 0,
+    "confidence_basis": [
+      "kms.keyDetails:absent"
+    ],
+    "grounding": {
+      "completeness": [
+        "kms.keyDetails:absent"
+      ]
+    },
+    "trace": [
+      "not assessed: required evidence incomplete (kms.keyDetails:absent)"
+    ],
+    "detail": "The customer-managed KMS key does not have automatic annual key rotation enabled."
+  },
+  {
+    "rule": {
+      "rule_id": "CORE-P0-KMS-ROTATION-GCP",
+      "version": "1",
+      "pack_id": "core-p0"
+    },
+    "entity_id": "",
+    "state": "not_applicable",
+    "confidence": 0,
+    "confidence_basis": [
+      "cloudkms.cryptoKeys:absent"
+    ],
+    "grounding": {
+      "completeness": [
+        "cloudkms.cryptoKeys:absent"
+      ]
+    },
+    "trace": [
+      "not assessed: required evidence incomplete (cloudkms.cryptoKeys:absent)"
+    ],
+    "detail": "The Cloud KMS crypto key has no rotation period configured, so it is never rotated automatically."
+  },
+  {
+    "rule": {
+      "rule_id": "CORE-P0-STORAGE-PUBLIC-AWS",
+      "version": "1",
+      "pack_id": "core-p0"
+    },
+    "entity_id": "//cloudsql.googleapis.com/projects/p/instances/open",
+    "entity_type": "data_store",
+    "state": "not_applicable",
+    "confidence": 0,
+    "confidence_basis": [
+      "s3.bucketConfig:absent"
+    ],
+    "grounding": {
+      "nodes": [
+        "//cloudsql.googleapis.com/projects/p/instances/open"
+      ],
+      "completeness": [
+        "s3.bucketConfig:absent"
+      ]
+    },
+    "trace": [
+      "data_store //cloudsql.googleapis.com/projects/p/instances/open: not assessed, required evidence incomplete (s3.bucketConfig:absent)"
+    ],
+    "detail": "The bucket policy grants public access, or its ACL grants access to all users. Public buckets expose their objects to anyone on the internet."
+  },
+  {
+    "rule": {
+      "rule_id": "CORE-P0-STORAGE-PUBLIC-AWS",
+      "version": "1",
+      "pack_id": "core-p0"
+    },
+    "entity_id": "//cloudsql.googleapis.com/projects/p/instances/scoped",
+    "entity_type": "data_store",
+    "state": "not_applicable",
+    "confidence": 0,
+    "confidence_basis": [
+      "s3.bucketConfig:absent"
+    ],
+    "grounding": {
+      "nodes": [
+        "//cloudsql.googleapis.com/projects/p/instances/scoped"
+      ],
+      "completeness": [
+        "s3.bucketConfig:absent"
+      ]
+    },
+    "trace": [
+      "data_store //cloudsql.googleapis.com/projects/p/instances/scoped: not assessed, required evidence incomplete (s3.bucketConfig:absent)"
+    ],
+    "detail": "The bucket policy grants public access, or its ACL grants access to all users. Public buckets expose their objects to anyone on the internet."
+  },
+  {
+    "rule": {
+      "rule_id": "CORE-P0-STORAGE-PUBLIC-AWS",
+      "version": "1",
+      "pack_id": "core-p0"
+    },
+    "entity_id": "//storage.googleapis.com/projects/_/buckets/priv",
+    "entity_type": "data_store",
+    "state": "not_applicable",
+    "confidence": 0,
+    "confidence_basis": [
+      "s3.bucketConfig:absent"
+    ],
+    "grounding": {
+      "nodes": [
+        "//storage.googleapis.com/projects/_/buckets/priv"
+      ],
+      "completeness": [
+        "s3.bucketConfig:absent"
+      ]
+    },
+    "trace": [
+      "data_store //storage.googleapis.com/projects/_/buckets/priv: not assessed, required evidence incomplete (s3.bucketConfig:absent)"
+    ],
+    "detail": "The bucket policy grants public access, or its ACL grants access to all users. Public buckets expose their objects to anyone on the internet."
+  },
+  {
+    "rule": {
+      "rule_id": "CORE-P0-STORAGE-PUBLIC-AWS",
+      "version": "1",
+      "pack_id": "core-p0"
+    },
+    "entity_id": "//storage.googleapis.com/projects/_/buckets/pub",
+    "entity_type": "data_store",
+    "state": "not_applicable",
+    "confidence": 0,
+    "confidence_basis": [
+      "s3.bucketConfig:absent"
+    ],
+    "grounding": {
+      "nodes": [
+        "//storage.googleapis.com/projects/_/buckets/pub"
+      ],
+      "completeness": [
+        "s3.bucketConfig:absent"
+      ]
+    },
+    "trace": [
+      "data_store //storage.googleapis.com/projects/_/buckets/pub: not assessed, required evidence incomplete (s3.bucketConfig:absent)"
+    ],
+    "detail": "The bucket policy grants public access, or its ACL grants access to all users. Public buckets expose their objects to anyone on the internet."
+  },
+  {
+    "rule": {
+      "rule_id": "CORE-P0-STORAGE-PUBLIC-AZURE",
+      "version": "1",
+      "pack_id": "core-p0"
+    },
+    "entity_id": "",
+    "state": "not_applicable",
+    "confidence": 0,
+    "confidence_basis": [
+      "storage.accounts:absent"
+    ],
+    "grounding": {
+      "completeness": [
+        "storage.accounts:absent"
+      ]
+    },
+    "trace": [
+      "not assessed: required evidence incomplete (storage.accounts:absent)"
+    ],
+    "detail": "The storage account has allow-blob-public-access enabled, so containers configured for public access expose their blobs to anonymous callers."
+  },
+  {
+    "rule": {
+      "rule_id": "CORE-P0-STORAGE-PUBLIC-GCP",
+      "version": "1",
+      "pack_id": "core-p0"
+    },
+    "entity_id": "//storage.googleapis.com/projects/_/buckets/priv",
+    "entity_type": "data_store",
+    "state": "pass",
+    "confidence": 80,
+    "confidence_basis": [
+      "base(80)"
+    ],
+    "grounding": {
+      "nodes": [
+        "//storage.googleapis.com/projects/_/buckets/priv"
+      ],
+      "completeness": [
+        "storage.bucketIam:complete"
+      ]
+    },
+    "trace": null,
+    "detail": "The bucket's IAM policy or legacy ACL grants access to allUsers or allAuthenticatedUsers, exposing its objects publicly."
+  },
+  {
+    "rule": {
+      "rule_id": "CORE-P0-STORAGE-PUBLIC-GCP",
+      "version": "1",
+      "pack_id": "core-p0"
+    },
+    "entity_id": "//storage.googleapis.com/projects/_/buckets/pub",
+    "entity_type": "data_store",
+    "state": "fail",
+    "confidence": 95,
+    "confidence_basis": [
+      "iam_all_users_binding(+15)"
+    ],
+    "grounding": {
+      "nodes": [
+        "//storage.googleapis.com/projects/_/buckets/pub"
+      ],
+      "facts": [
+        "iam_all_users_roles=roles/storage.objectViewer on //storage.googleapis.com/projects/_/buckets/pub"
+      ],
+      "completeness": [
+        "storage.bucketIam:complete"
+      ]
+    },
+    "trace": [
+      "data_store //storage.googleapis.com/projects/_/buckets/pub: fact iam_all_users_roles=\"roles/storage.objectViewer\""
+    ],
+    "detail": "The bucket's IAM policy or legacy ACL grants access to allUsers or allAuthenticatedUsers, exposing its objects publicly."
+  }
+]

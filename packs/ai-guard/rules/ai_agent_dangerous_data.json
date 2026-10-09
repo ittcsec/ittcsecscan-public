@@ -1,0 +1,28 @@
+{
+  "id": "AIG-DATA-DANGEROUS",
+  "version": "1",
+  "pack_id": "ai-guard",
+  "severity": "high",
+  "title": "AI agent is connected to a sensitive or exposed data source",
+  "detail": "The agent is grounded on a data source that is classified sensitive, is reachable from the internet, or sits outside the collected account (for example a crawled web source). Grounding an agent on such data widens the blast radius of a prompt injection or a compromised agent, because the agent can read and surface that data.",
+  "selector": { "node_type": "ai_agent" },
+  "predicate": { "op": "has_edge", "edge": "accesses_data", "target": {
+    "node_type": "data_store",
+    "predicate": { "op": "or", "children": [
+      { "op": "fact_equals", "fact": "sensitivity", "value": "high" },
+      { "op": "fact_equals", "fact": "internet_exposed", "value": "true" },
+      { "op": "fact_equals", "fact": "external", "value": "true" }
+    ] }
+  } },
+  "requires": {
+    "nodes": ["ai_agent", "data_store"],
+    "edges": ["accesses_data"],
+    "completeness": ["bedrock.agents", "bedrock.knowledgeBases"]
+  },
+  "confidence": { "base": 70, "factors": [
+    { "name": "internet_exposed_store", "when": { "op": "has_edge", "edge": "accesses_data", "target": {
+      "node_type": "data_store", "predicate": { "op": "fact_equals", "fact": "internet_exposed", "value": "true" } } }, "delta": 20 },
+    { "name": "sensitive_store", "when": { "op": "has_edge", "edge": "accesses_data", "target": {
+      "node_type": "data_store", "predicate": { "op": "fact_equals", "fact": "sensitivity", "value": "high" } } }, "delta": 15 }
+  ] }
+}

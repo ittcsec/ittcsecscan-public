@@ -1,0 +1,12 @@
+{
+  "id": "CORE-P0-COMPUTE-INTERNET-EXPOSED-GCP",
+  "version": "1",
+  "pack_id": "core-p0",
+  "severity": "high",
+  "title": "Compute Engine instance is exposed to the internet on all ports",
+  "detail": "An ingress firewall rule allows an internet source (0.0.0.0/0) across all ports on the instance's network, and no higher priority rule denies it, so an internet source can reach the instance on every port at the network layer. This is configuration exposure derived from the collected rules, not verified reachability.",
+  "selector": { "node_type": "compute", "predicate": { "op": "fact_equals", "fact": "exposure_provider", "value": "gcp" } },
+  "predicate": { "op": "fact_equals", "fact": "internet_exposed_all_ports", "value": "true" },
+  "requires": { "nodes": ["compute"], "completeness": ["compute.instances", "compute.firewalls"] },
+  "confidence": { "base": 80 }
+}

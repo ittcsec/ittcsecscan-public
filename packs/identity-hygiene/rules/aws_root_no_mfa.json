@@ -1,0 +1,13 @@
+{
+  "id": "IDH-AWS-ROOT-NO-MFA",
+  "version": "1",
+  "pack_id": "identity-hygiene",
+  "severity": "critical",
+  "title": "Root account has no MFA",
+  "detail": "The AWS account root user has no MFA device enabled. The root user has unrestricted access, so a root login without MFA is a critical exposure. This reads the account credential report root row.",
+  "selector": { "node_type": "identity", "predicate": { "op": "fact_equals", "fact": "cred_user", "value": "<root_account>" } },
+  "indeterminate": { "op": "not", "children": [ { "op": "fact_present", "fact": "cred_mfa_active" } ] },
+  "predicate": { "op": "fact_equals", "fact": "cred_mfa_active", "value": "false" },
+  "requires": { "nodes": ["identity"], "completeness": ["iam.credentialReport"] },
+  "confidence": { "base": 95 }
+}

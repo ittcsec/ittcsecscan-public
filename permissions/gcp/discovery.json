@@ -1,0 +1,168 @@
+{
+  "schema_version": "permissions.v1",
+  "provider": "gcp",
+  "profile": "discovery",
+  "verification": { "status": "unverified" },
+  "permissions": [
+    {
+      "permission": "iam.serviceAccounts.list",
+      "enabled_by": ["collector:gcp.iam.serviceaccounts", "collector:gcp.iam.serviceAccountKeys"],
+      "verification": { "status": "unverified" }
+    },
+    {
+      "permission": "iam.serviceAccountKeys.list",
+      "enabled_by": ["collector:gcp.iam.serviceAccountKeys"],
+      "verification": { "status": "unverified" }
+    },
+    {
+      "permission": "iam.workloadIdentityPools.list",
+      "enabled_by": ["collector:gcp.iam.workloadIdentityFederation"],
+      "verification": { "status": "unverified" }
+    },
+    {
+      "permission": "iam.workloadIdentityPoolProviders.list",
+      "enabled_by": ["collector:gcp.iam.workloadIdentityFederation"],
+      "verification": { "status": "unverified" }
+    },
+    {
+      "permission": "orgpolicy.policies.get",
+      "enabled_by": ["collector:gcp.orgpolicy.effective"],
+      "verification": { "status": "unverified" }
+    },
+    {
+      "permission": "resourcemanager.projects.getIamPolicy",
+      "enabled_by": ["collector:gcp.iam.policy", "collector:gcp.cloudidentity.groupMembers"],
+      "verification": { "status": "unverified" }
+    },
+    {
+      "permission": "iam.roles.get",
+      "enabled_by": ["collector:gcp.iam.policy"],
+      "verification": { "status": "unverified" }
+    },
+    {
+      "permission": "iam.denypolicies.list",
+      "enabled_by": ["collector:gcp.iam.policy"],
+      "verification": { "status": "unverified" }
+    },
+    {
+      "permission": "cloudidentity.groups.get",
+      "enabled_by": ["collector:gcp.cloudidentity.groupMembers"],
+      "verification": { "status": "unverified" }
+    },
+    {
+      "permission": "cloudidentity.groups.memberships.list",
+      "enabled_by": ["collector:gcp.cloudidentity.groupMembers"],
+      "verification": { "status": "unverified" }
+    },
+    {
+      "permission": "storage.buckets.list",
+      "enabled_by": ["collector:gcp.storage.buckets"],
+      "verification": { "status": "unverified" }
+    },
+    {
+      "permission": "storage.buckets.getIamPolicy",
+      "enabled_by": ["collector:gcp.storage.buckets"],
+      "verification": { "status": "unverified" }
+    },
+    {
+      "permission": "compute.instances.list",
+      "enabled_by": ["collector:gcp.compute.instances"],
+      "verification": { "status": "unverified" }
+    },
+    {
+      "permission": "compute.networks.list",
+      "enabled_by": ["collector:gcp.compute.network"],
+      "verification": { "status": "unverified" }
+    },
+    {
+      "permission": "compute.subnetworks.list",
+      "enabled_by": ["collector:gcp.compute.network"],
+      "verification": { "status": "unverified" }
+    },
+    {
+      "permission": "compute.firewalls.list",
+      "enabled_by": ["collector:gcp.compute.network"],
+      "verification": { "status": "unverified" }
+    },
+    {
+      "permission": "compute.routes.list",
+      "enabled_by": ["collector:gcp.compute.network"],
+      "verification": { "status": "unverified" }
+    },
+    {
+      "permission": "compute.routers.list",
+      "enabled_by": ["collector:gcp.compute.network"],
+      "verification": { "status": "unverified" }
+    },
+    {
+      "permission": "compute.addresses.list",
+      "enabled_by": ["collector:gcp.compute.network"],
+      "verification": { "status": "unverified" }
+    },
+    {
+      "permission": "compute.globalAddresses.list",
+      "enabled_by": ["collector:gcp.compute.network"],
+      "verification": { "status": "unverified" }
+    },
+    {
+      "permission": "compute.forwardingRules.list",
+      "enabled_by": ["collector:gcp.compute.network"],
+      "verification": { "status": "unverified" }
+    },
+    {
+      "permission": "compute.globalForwardingRules.list",
+      "enabled_by": ["collector:gcp.compute.network"],
+      "verification": { "status": "unverified" }
+    },
+    {
+      "permission": "cloudsql.instances.list",
+      "enabled_by": ["collector:gcp.cloudsql.instances"],
+      "verification": { "status": "unverified" }
+    },
+    {
+      "permission": "cloudkms.locations.list",
+      "enabled_by": ["collector:gcp.cloudkms.cryptokeys"],
+      "verification": { "status": "unverified" }
+    },
+    {
+      "permission": "cloudkms.keyRings.list",
+      "enabled_by": ["collector:gcp.cloudkms.cryptokeys"],
+      "verification": { "status": "unverified" }
+    },
+    {
+      "permission": "cloudkms.cryptoKeys.list",
+      "enabled_by": ["collector:gcp.cloudkms.cryptokeys"],
+      "verification": { "status": "unverified" }
+    },
+    {
+      "permission": "logging.sinks.list",
+      "enabled_by": ["collector:gcp.logging"],
+      "verification": { "status": "unverified" }
+    },
+    {
+      "permission": "logging.buckets.list",
+      "enabled_by": ["collector:gcp.logging"],
+      "verification": { "status": "unverified" }
+    },
+    {
+      "permission": "securitycenter.sources.list",
+      "enabled_by": ["collector:gcp.scc.sources"],
+      "verification": { "status": "unverified" }
+    },
+    {
+      "permission": "resourcemanager.projects.get",
+      "enabled_by": ["collector:gcp.resourcemanager.hierarchy"],
+      "verification": { "status": "unverified" }
+    },
+    {
+      "permission": "resourcemanager.folders.get",
+      "enabled_by": ["collector:gcp.resourcemanager.hierarchy"],
+      "verification": { "status": "unverified" }
+    },
+    {
+      "permission": "resourcemanager.organizations.get",
+      "enabled_by": ["collector:gcp.resourcemanager.hierarchy"],
+      "verification": { "status": "unverified" }
+    }
+  ]
+}

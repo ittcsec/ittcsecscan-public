@@ -1,0 +1,7 @@
+{
+  "schema_version": "permissions.v1",
+  "provider": "gcp",
+  "profile": "deep-evidence",
+  "verification": { "status": "unverified" },
+  "permissions": []
+}

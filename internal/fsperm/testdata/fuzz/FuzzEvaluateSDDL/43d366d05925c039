@@ -1,0 +1,2 @@
+go test fuzz v1
+string("O:S-1-0D:(A;;FA;;;)")

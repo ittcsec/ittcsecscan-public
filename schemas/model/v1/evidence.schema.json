@@ -1,0 +1,6 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:ittcsecscan:schema:model:evidence:v1",
+  "title": "Canonical evidence envelope",
+  "$ref": "urn:ittcsecscan:schema:model:common:v1#/$defs/evidence"
+}

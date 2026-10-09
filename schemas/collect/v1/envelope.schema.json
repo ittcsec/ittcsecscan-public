@@ -1,0 +1,40 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:ittcsecscan:schema:collect:envelope:v1",
+  "title": "ittcsecscan collection evidence envelope",
+  "description": "The redacted, secret-free record of one read performed by a collector (ADR-0018 §2). The response never contains a secret value or object content, and carries enough provenance to reproduce and audit the call.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["provider", "service", "operation", "region", "collected_at", "scope", "response", "provenance"],
+  "properties": {
+    "provider": { "enum": ["aws", "azure", "gcp", "github", "gitlab", "kubernetes", "okta", "google_workspace", "mcp"] },
+    "service": { "type": "string", "minLength": 1 },
+    "operation": { "type": "string", "minLength": 1 },
+    "region": {
+      "description": "The region the read was scoped to, or \"global\".",
+      "type": "string",
+      "minLength": 1
+    },
+    "collected_at": { "type": "string", "format": "date-time" },
+    "scope": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "account": { "type": "string" },
+        "resource": { "type": "string" }
+      }
+    },
+    "response": {
+      "description": "The provider response, redacted and free of secret values and object contents."
+    },
+    "provenance": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["api_version", "collector"],
+      "properties": {
+        "api_version": { "type": "string", "minLength": 1 },
+        "collector": { "type": "string", "minLength": 1 }
+      }
+    }
+  }
+}

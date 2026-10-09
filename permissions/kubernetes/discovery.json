@@ -1,0 +1,38 @@
+{
+  "schema_version": "permissions.v1",
+  "provider": "kubernetes",
+  "profile": "discovery",
+  "verification": { "status": "unverified" },
+  "permissions": [
+    {
+      "permission": "list:namespaces",
+      "enabled_by": ["collector:kubernetes.namespaces"],
+      "verification": { "status": "unverified" }
+    },
+    {
+      "permission": "list:serviceaccounts",
+      "enabled_by": ["collector:kubernetes.serviceaccounts"],
+      "verification": { "status": "unverified" }
+    },
+    {
+      "permission": "list:roles.rbac.authorization.k8s.io",
+      "enabled_by": ["collector:kubernetes.rbac"],
+      "verification": { "status": "unverified" }
+    },
+    {
+      "permission": "list:rolebindings.rbac.authorization.k8s.io",
+      "enabled_by": ["collector:kubernetes.rbac"],
+      "verification": { "status": "unverified" }
+    },
+    {
+      "permission": "list:clusterroles.rbac.authorization.k8s.io",
+      "enabled_by": ["collector:kubernetes.rbac"],
+      "verification": { "status": "unverified" }
+    },
+    {
+      "permission": "list:clusterrolebindings.rbac.authorization.k8s.io",
+      "enabled_by": ["collector:kubernetes.rbac"],
+      "verification": { "status": "unverified" }
+    }
+  ]
+}

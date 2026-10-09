@@ -1,0 +1,21 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:ittcsecscan:schema:model:entity:v1",
+  "title": "Canonical entity (attack-graph node)",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "id", "provider", "type", "native_id", "criticality", "first_seen", "last_seen"],
+  "properties": {
+    "schema_version": { "$ref": "urn:ittcsecscan:schema:model:common:v1#/$defs/schema_version" },
+    "id": { "$ref": "urn:ittcsecscan:schema:model:common:v1#/$defs/stable_id" },
+    "provider": { "$ref": "urn:ittcsecscan:schema:model:common:v1#/$defs/provider" },
+    "type": { "$ref": "urn:ittcsecscan:schema:model:common:v1#/$defs/node_type" },
+    "native_id": { "type": "string" },
+    "name": { "type": "string" },
+    "criticality": { "type": "integer", "minimum": 0 },
+    "tags": { "type": "object", "additionalProperties": { "type": "string" } },
+    "attributes": { "type": "object", "additionalProperties": { "type": "string" } },
+    "first_seen": { "$ref": "urn:ittcsecscan:schema:model:common:v1#/$defs/timestamp" },
+    "last_seen": { "$ref": "urn:ittcsecscan:schema:model:common:v1#/$defs/timestamp" }
+  }
+}

@@ -1,0 +1,15 @@
+{
+  "id": "CORE-P0-KEYVAULT-PURGE-AZURE",
+  "version": "1",
+  "pack_id": "core-p0",
+  "severity": "medium",
+  "title": "Key Vault purge protection is disabled",
+  "detail": "The key vault does not have purge protection enabled, so a deleted vault or key can be permanently purged within the retention window, defeating recovery.",
+  "selector": { "node_type": "control", "predicate": { "op": "fact_equals", "fact": "azure_type", "value": "key_vault" } },
+  "predicate": { "op": "or", "children": [
+    { "op": "fact_absent", "fact": "purge_protection" },
+    { "op": "fact_equals", "fact": "purge_protection", "value": "false" }
+  ] },
+  "requires": { "nodes": ["control"], "completeness": ["keyvault.vaults"] },
+  "confidence": { "base": 70 }
+}

@@ -1,0 +1,304 @@
+# Continuous integration for ittcsecscan.
+#
+# Security posture of this workflow:
+#   - read-only GITHUB_TOKEN; no repository secrets are used anywhere;
+#   - triggered by pull_request (never pull_request_target), so forks cannot
+#     reach privileged context;
+#   - third-party actions pinned by full commit SHA; checkout does not persist
+#     credentials;
+#   - tools are built from pinned, checksum-verified modules (tools/*/go.mod);
+#   - GOTOOLCHAIN=local so the verified setup-go toolchain is the one used.
+name: ci
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  GO_VERSION: "1.27.1"
+  GOTOOLCHAIN: local
+  # The product module is vendored (ADR-0017): builds, tests, and the release
+  # compile from vendor/, so the code that runs with the operator's cloud
+  # credentials is in-tree and offline-reproducible. Supply-chain analysis
+  # tools that need full module metadata (go-licenses) override this per step.
+  GOFLAGS: -mod=vendor
+
+jobs:
+  lint:
+    name: format, vet, lint
+    runs-on: ubuntu-24.04
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-go@b7ad1dad31e06c5925ef5d2fc7ad053ef454303e # v7.0.0
+        with:
+          go-version: ${{ env.GO_VERSION }}
+          cache-dependency-path: |
+            go.sum
+            tools/*/go.sum
+      - name: Toolchain matches go.mod
+        run: grep -qx "toolchain go${GO_VERSION}" go.mod
+      - name: Verify module checksums
+        run: go mod verify
+      - name: go.mod and go.sum are tidy
+        run: go mod tidy -diff
+      - name: Vendor directory is consistent with go.mod
+        env:
+          GOFLAGS: -mod=mod
+        run: |
+          go mod vendor
+          git diff --exit-code -- vendor go.mod go.sum
+      - name: gofmt
+        run: |
+          unformatted="$(gofmt -l . | grep -v '^vendor/' || true)"
+          if [ -n "$unformatted" ]; then echo "$unformatted"; exit 1; fi
+      - name: go vet
+        run: go vet ./...
+      - name: Build pinned tools
+        run: ./tools/install.sh
+      - name: golangci-lint
+        run: ./bin/golangci-lint run ./...
+
+  test:
+    name: unit tests (${{ matrix.os }})
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-24.04, windows-2025, macos-15]
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-go@b7ad1dad31e06c5925ef5d2fc7ad053ef454303e # v7.0.0
+        with:
+          go-version: ${{ env.GO_VERSION }}
+      - name: Unit tests
+        run: go test -count=1 -shuffle=on ./...
+      # Verbose evidence for the tenant-isolation redirection tests: each must
+      # show PASS. They may skip only on Windows, and only for a missing
+      # symbolic-link privilege; anywhere else a skip condition fails them.
+      - name: Tenant-isolation redirection tests (verbose)
+        run: go test -count=1 -v -run 'Symlink|HardLink|LinkedSidecar|Junction|Exposed' ./internal/store/
+      # Verbose evidence for the migration framework (ADR-0011 §2): the five
+      # rollback test kinds, the lock, and restore isolation, each shown as
+      # PASS on every OS.
+      - name: Migration framework tests (verbose)
+        run: go test -count=1 -v -run 'Migrat|Restore|Tamper|PreviousBinary' ./internal/store/
+      # Enforced migration gates (ADR-0012 §3): no contract migration ships
+      # before the T-28 shared open lock, and every expand migration is
+      # additive. Fails if either test is missing, skipped, or failing.
+      - name: Migration gates (T-28 contract gate, additive expand)
+        shell: bash
+        run: |
+          go test -count=1 -v -run '^(TestT28ContractMigrationGate|TestExpandMigrationsAreAdditive)$' ./internal/store/ | tee "$RUNNER_TEMP/gates.txt"
+          for t in TestT28ContractMigrationGate TestExpandMigrationsAreAdditive; do
+            grep -q -- "--- PASS: $t " "$RUNNER_TEMP/gates.txt" || { echo "::error::$t did not pass"; exit 1; }
+          done
+
+  race:
+    name: race detector
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    env:
+      CGO_ENABLED: "1"
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-go@b7ad1dad31e06c5925ef5d2fc7ad053ef454303e # v7.0.0
+        with:
+          go-version: ${{ env.GO_VERSION }}
+      - name: Tests with -race
+        run: go test -race -count=1 ./...
+
+  # The race detector needs cgo. This job covers the Windows-specific code
+  # paths that the Linux job cannot reach. The macOS race detector runs on a
+  # schedule and on merge to main (.github/workflows/scheduled.yml) rather
+  # than on every pull request: a macOS runner bills at 10x, and no
+  # macOS-specific bug has been caught by the race detector (the one
+  # macOS-specific behaviour, fsperm's "unknown" ACL result, is exercised by
+  # the every-PR "unit tests (macos-15)" job).
+  race-windows:
+    name: race detector (windows-2025)
+    runs-on: windows-2025
+    timeout-minutes: 25
+    env:
+      CGO_ENABLED: "1"
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-go@b7ad1dad31e06c5925ef5d2fc7ad053ef454303e # v7.0.0
+        with:
+          go-version: ${{ env.GO_VERSION }}
+      - name: C compiler present (required by -race)
+        run: gcc --version
+      - name: Tests with -race
+        run: go test -race -count=1 ./...
+
+  fuzz:
+    name: fuzz ${{ matrix.target.fn }}
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    strategy:
+      fail-fast: false
+      matrix:
+        target:
+          - { pkg: ./internal/redact, fn: FuzzString }
+          - { pkg: ./internal/termsafe, fn: FuzzSanitize }
+          - { pkg: ./internal/config, fn: FuzzDecode }
+          - { pkg: ./internal/fsperm, fn: FuzzEvaluateSDDL }
+          - { pkg: ./internal/fsperm, fn: FuzzParsePOSIXACL }
+          - { pkg: ./internal/store, fn: FuzzParseTenantID }
+          - { pkg: ./internal/store, fn: FuzzKeyBinding }
+          - { pkg: ./internal/store, fn: FuzzFirstScanRejectsBadRecords }
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-go@b7ad1dad31e06c5925ef5d2fc7ad053ef454303e # v7.0.0
+        with:
+          go-version: ${{ env.GO_VERSION }}
+      - name: Fuzz for 60s
+        env:
+          PKG: ${{ matrix.target.pkg }}
+          FN: ${{ matrix.target.fn }}
+        run: go test -run='^$' -fuzz="^${FN}\$" -fuzztime=60s "$PKG"
+      - name: Keep failing inputs
+        if: failure()
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: fuzz-${{ matrix.target.fn }}
+          path: "**/testdata/fuzz/**"
+          retention-days: 14
+
+  security:
+    name: vulnerabilities, secrets, licenses
+    runs-on: ubuntu-24.04
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+          fetch-depth: 0 # secret scanning covers the full history
+      - uses: actions/setup-go@b7ad1dad31e06c5925ef5d2fc7ad053ef454303e # v7.0.0
+        with:
+          go-version: ${{ env.GO_VERSION }}
+          cache-dependency-path: |
+            go.sum
+            tools/*/go.sum
+      - name: Build pinned tools
+        run: ./tools/install.sh
+      - name: govulncheck
+        run: ./bin/govulncheck ./...
+      - name: govulncheck (pinned tools, reachable code in each built binary)
+        run: |
+          status=0
+          for b in bin/*; do
+            echo "== $b"
+            ./bin/govulncheck -mode=binary "$b" || status=1
+          done
+          exit "$status"
+      - name: gitleaks (git history)
+        run: ./bin/gitleaks git --no-banner --redact --exit-code 1 .
+      - name: gitleaks (working tree)
+        run: ./bin/gitleaks dir --no-banner --redact --exit-code 1 .
+      - name: License allow-list
+        # go-licenses reads license files from the module cache, not vendor/, so
+        # it runs in module mode; the build stays vendored.
+        env:
+          GOFLAGS: -mod=mod
+        run: >-
+          ./bin/go-licenses check ./...
+          --allowed_licenses=Apache-2.0,BSD-2-Clause,BSD-3-Clause,MIT,ISC
+          --ignore github.com/ittcsec/ittcsecscan
+
+  release-prep:
+    name: reproducible build and SBOM
+    runs-on: ubuntu-24.04
+    # This job compiles every target twice and diffs the outputs to prove the build
+    # is reproducible. That work is unchanged: nothing in the double build or the
+    # byte-for-byte comparison is shortened or skipped here, only the wall-clock this
+    # job is allowed to take. The double build grew from ~23 min to ~25 min as the
+    # vendored AWS SDKs expanded (RDS, KMS), brushing the old 25 min ceiling on
+    # slower runners. AWS Config and the five security-service SDKs are the last
+    # large vendor-growth spurt expected in this phase, so 45 min holds with real
+    # margin through the rest of the AWS work rather than needing another bump.
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-go@b7ad1dad31e06c5925ef5d2fc7ad053ef454303e # v7.0.0
+        with:
+          go-version: ${{ env.GO_VERSION }}
+          cache-dependency-path: |
+            go.sum
+            tools/*/go.sum
+      - name: Build pinned tools
+        run: ./tools/install.sh
+      - name: Release signing scripts and trust root (throwaway keys)
+        run: sh release/signing_test.sh
+      - name: Build twice from different directories and caches
+        run: |
+          export SOURCE_DATE_EPOCH="$(git log -1 --format=%ct)"
+          ./release/build.sh 0.0.0-ci "$RUNNER_TEMP/build-a"
+          go clean -cache   # Build A's default cache is dead weight now; Build B uses its own ($RUNNER_TEMP/gocache-b). Frees disk so the second cross-platform build does not exhaust the runner.
+          cp -R . "$RUNNER_TEMP/src-b"
+          (cd "$RUNNER_TEMP/src-b" && GOCACHE="$RUNNER_TEMP/gocache-b" ./release/build.sh 0.0.0-ci "$RUNNER_TEMP/build-b")
+          diff "$RUNNER_TEMP/build-a/SHA256SUMS" "$RUNNER_TEMP/build-b/SHA256SUMS"
+          echo "reproducible: both builds match"
+      - name: Built binary reports its identity
+        run: |
+          "$RUNNER_TEMP/build-a/ittcsecscan_0.0.0-ci_linux_amd64" version --json
+          "$RUNNER_TEMP/build-a/ittcsecscan_0.0.0-ci_linux_amd64" doctor --json
+      - name: CycloneDX SBOM per target
+        run: |
+          for target in linux/amd64 linux/arm64 darwin/amd64 darwin/arm64 windows/amd64 windows/arm64; do
+            goos="${target%/*}"; goarch="${target#*/}"
+            CGO_ENABLED=0 GOOS="$goos" GOARCH="$goarch" ./bin/cyclonedx-gomod app -json -licenses -noserial -notimestamp \
+              -main cmd/ittcsecscan -output "$RUNNER_TEMP/build-a/ittcsecscan_${goos}_${goarch}.cdx.json" .
+          done
+      - name: Upload release-preparation artefacts (unsigned)
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: release-prep-unsigned
+          path: ${{ runner.temp }}/build-a
+          retention-days: 7
+          if-no-files-found: error
+
+  scale:
+    name: scale benchmark (500k entities)
+    # ADR-0011 §4, decision 8. Reporting only for now (owner decision,
+    # 2026-09-13): not a required check. It fails when:
+    #   - the median graph load exceeds 10 s (ADR-0011 §4);
+    #   - the initial load exceeds 90 s (owner decision, 2026-09-13). The
+    #     load uses a 256 MiB page cache. Baselines: 64 s on the maintainer's
+    #     laptop; on this runner, 78 s before the cache and 66 s with it;
+    #   - a hot query's plan changes.
+    # It writes its measurements to the job summary. The maintainer decides when
+    # it becomes required.
+    runs-on: ubuntu-24.04
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-go@b7ad1dad31e06c5925ef5d2fc7ad053ef454303e # v7.0.0
+        with:
+          go-version: ${{ env.GO_VERSION }}
+      - name: Scale benchmark, 500,000 entities and 5,000,000 edges
+        run: go test -count=1 -timeout 55m -v -run '^TestScaleProfile$' ./internal/store/ -args -scale.entities=500000 -scale.budget=10s -scale.ingest-budget=90s -scale.summary="$GITHUB_STEP_SUMMARY"

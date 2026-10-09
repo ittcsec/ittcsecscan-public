@@ -1,0 +1,209 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:ittcsecscan:schema:cli:scan:v1",
+  "title": "ittcsecscan scan --json output",
+  "description": "Result of one scan of a tenant. Coverage is reported per provider; a provider that could not authenticate, or an enumeration that did not finish, is a gap and is never reported as a complete outcome.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "tenant", "scan_id", "outcome", "authenticated", "dropped_edges", "providers"],
+  "properties": {
+    "schema_version": { "const": 1 },
+    "tenant": {
+      "description": "The tenant that was scanned. With --create this is the newly generated id.",
+      "type": "string",
+      "minLength": 26,
+      "maxLength": 26
+    },
+    "scan_id": {
+      "description": "The stored scan's id, or 0 when nothing was ingested (no provider authenticated).",
+      "type": "integer",
+      "minimum": 0
+    },
+    "outcome": {
+      "description": "complete when every authenticated provider was fully covered; incomplete when any coverage gap remains; auth-failed when no provider authenticated.",
+      "enum": ["complete", "incomplete", "auth-failed"]
+    },
+    "authenticated": {
+      "description": "Number of providers that authenticated and ran collectors.",
+      "type": "integer",
+      "minimum": 0
+    },
+    "dropped_edges": {
+      "description": "Edges dropped at ingest because an endpoint was not among the collected entities.",
+      "type": "integer",
+      "minimum": 0
+    },
+    "providers": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["provider", "authenticated", "coverage"],
+        "properties": {
+          "provider": { "enum": ["aws", "azure", "gcp", "github", "gitlab", "kubernetes", "okta", "google_workspace", "mcp"] },
+          "account": {
+            "description": "The provider account, subscription, or project the scan authenticated to. Absent when authentication failed.",
+            "type": "string"
+          },
+          "authenticated": { "type": "boolean" },
+          "auth_error": {
+            "description": "Why the provider could not authenticate, redacted. Present only when authenticated is false.",
+            "type": "string"
+          },
+          "coverage": {
+            "description": "One record per enumeration. status is complete only when every page was read.",
+            "type": "array",
+            "items": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": ["service", "region", "scope", "status", "collected"],
+              "properties": {
+                "service": { "type": "string" },
+                "region": { "type": "string" },
+                "scope": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "properties": {
+                    "account": { "type": "string" },
+                    "resource": { "type": "string" }
+                  }
+                },
+                "status": { "enum": ["complete", "partial", "denied", "unsupported", "error"] },
+                "collected": { "type": "integer", "minimum": 0 },
+                "reason": { "type": "string" }
+              }
+            }
+          }
+        }
+      }
+    },
+    "findings": {
+      "description": "Present when the scan ran the analysis pipeline (the default; suppressed by --collect-only). Detection findings from the built-in packs evaluated over the reachability-augmented graph. not_applicable results are counted in totals but omitted from items.",
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["totals", "items"],
+      "properties": {
+        "totals": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["fail", "unknown", "error", "pass", "not_applicable"],
+          "properties": {
+            "fail": { "type": "integer", "minimum": 0 },
+            "unknown": { "type": "integer", "minimum": 0 },
+            "error": { "type": "integer", "minimum": 0 },
+            "pass": { "type": "integer", "minimum": 0 },
+            "not_applicable": { "type": "integer", "minimum": 0 }
+          }
+        },
+        "items": {
+          "description": "One entry per non-not-applicable result, ordered by rule then entity.",
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["rule", "entity", "state", "risk", "confidence", "risk_basis"],
+            "properties": {
+              "rule": { "type": "string" },
+              "entity": { "type": "string" },
+              "state": { "enum": ["fail", "unknown", "error", "pass"] },
+              "risk": { "type": "integer", "minimum": 0 },
+              "confidence": { "type": "integer", "minimum": 0 },
+              "risk_basis": { "type": "array", "items": { "type": "string" } },
+              "detail": { "type": "string" }
+            }
+          }
+        }
+      }
+    },
+    "classification": {
+      "description": "Present when the scan ran the analysis pipeline (the default; suppressed by --collect-only). The sensitivity classification of the tenant's assets, derived from collected metadata. unknown is the fail-closed state for an asset the metadata could not classify.",
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["totals", "items"],
+      "properties": {
+        "totals": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["high", "moderate", "low", "unknown"],
+          "properties": {
+            "high": { "type": "integer", "minimum": 0 },
+            "moderate": { "type": "integer", "minimum": 0 },
+            "low": { "type": "integer", "minimum": 0 },
+            "unknown": { "type": "integer", "minimum": 0 }
+          }
+        },
+        "items": {
+          "description": "One entry per classified asset, ordered by entity.",
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["entity", "sensitivity", "confidence", "method"],
+            "properties": {
+              "entity": { "type": "string" },
+              "sensitivity": { "enum": ["high", "moderate", "low", "unknown"] },
+              "confidence": { "type": "integer", "minimum": 0 },
+              "method": { "type": "string" }
+            }
+          }
+        }
+      }
+    },
+    "attack": {
+      "description": "Present when the scan ran the analysis pipeline (the default; suppressed by --collect-only). Attack paths from internet-exposed workloads to privileged identities, and cut candidates ranked by risk reduction against effort. Paths are configuration-derived, never verified exploitability.",
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["paths", "cuts"],
+      "properties": {
+        "paths": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["entry", "target", "score", "confidence", "risk", "risk_basis", "steps"],
+            "properties": {
+              "entry": { "type": "string" },
+              "target": { "type": "string" },
+              "score": { "type": "integer", "minimum": 0 },
+              "confidence": { "type": "integer", "minimum": 0 },
+              "risk": { "type": "integer", "minimum": 0 },
+              "risk_basis": { "type": "array", "items": { "type": "string" } },
+              "steps": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "required": ["node"],
+                  "properties": {
+                    "node": { "type": "string" },
+                    "via": { "type": "string" },
+                    "technique": { "type": "string" }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "cuts": {
+          "description": "Cut candidates, ranked most-leverage first (risk reduction against effort).",
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["kind", "source", "target", "description", "paths_removed", "risk_reduction", "effort", "disruption"],
+            "properties": {
+              "kind": { "type": "string" },
+              "source": { "type": "string" },
+              "target": { "type": "string" },
+              "description": { "type": "string" },
+              "paths_removed": { "type": "integer", "minimum": 0 },
+              "risk_reduction": { "type": "integer", "minimum": 0 },
+              "effort": { "type": "integer", "minimum": 0 },
+              "disruption": { "type": "integer", "minimum": 0 }
+            }
+          }
+        }
+      }
+    }
+  }
+}

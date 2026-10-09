@@ -1,0 +1,18 @@
+{
+  "schema_version": "permissions.v1",
+  "provider": "github",
+  "profile": "discovery",
+  "verification": { "status": "unverified" },
+  "permissions": [
+    {
+      "permission": "metadata:read",
+      "enabled_by": ["collector:github.repositories", "collector:github.workflows", "collector:github.artifacts"],
+      "verification": { "status": "unverified" }
+    },
+    {
+      "permission": "actions:read",
+      "enabled_by": ["collector:github.workflows", "collector:github.artifacts"],
+      "verification": { "status": "unverified" }
+    }
+  ]
+}

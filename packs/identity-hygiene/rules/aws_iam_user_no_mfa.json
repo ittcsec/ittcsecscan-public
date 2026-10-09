@@ -1,0 +1,19 @@
+{
+  "id": "IDH-AWS-IAM-USER-NO-MFA",
+  "version": "1",
+  "pack_id": "identity-hygiene",
+  "severity": "high",
+  "title": "IAM user with console access has no MFA",
+  "detail": "An IAM user that has a console sign-in password has no MFA device enabled. A password-only human login is a prime credential-theft and phishing target; MFA is the baseline control. The root account is assessed separately. This reads the account credential report and is never inferred from a name.",
+  "selector": { "node_type": "identity", "predicate": { "op": "and", "children": [
+    { "op": "fact_equals", "fact": "credential_report", "value": "true" },
+    { "op": "not", "children": [ { "op": "fact_equals", "fact": "cred_user", "value": "<root_account>" } ] }
+  ] } },
+  "indeterminate": { "op": "not", "children": [ { "op": "fact_present", "fact": "cred_mfa_active" } ] },
+  "predicate": { "op": "and", "children": [
+    { "op": "fact_equals", "fact": "cred_password_enabled", "value": "true" },
+    { "op": "fact_equals", "fact": "cred_mfa_active", "value": "false" }
+  ] },
+  "requires": { "nodes": ["identity"], "completeness": ["iam.credentialReport"] },
+  "confidence": { "base": 90 }
+}

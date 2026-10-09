@@ -1,0 +1,7 @@
+{
+  "schema_version": "permissions.v1",
+  "provider": "aws",
+  "profile": "deep-evidence",
+  "verification": { "status": "unverified" },
+  "permissions": []
+}

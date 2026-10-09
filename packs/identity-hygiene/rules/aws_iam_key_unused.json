@@ -1,0 +1,55 @@
+{
+  "id": "IDH-AWS-IAM-KEY-UNUSED",
+  "version": "1",
+  "pack_id": "identity-hygiene",
+  "severity": "medium",
+  "title": "Active IAM access key is unused",
+  "detail": "An active IAM access key has not been used in over 90 days, or was never used and was created over 90 days ago. An unused long-lived key is standing attack surface that should be deactivated. The 90-day threshold lives in this signed rule; the age in days is a collected fact. A key whose age data is missing or a report sentinel is reported not assessed, never passed.",
+  "selector": { "node_type": "identity", "predicate": { "op": "fact_equals", "fact": "credential_report", "value": "true" } },
+  "indeterminate": { "op": "or", "children": [
+    { "op": "and", "children": [
+      { "op": "fact_equals", "fact": "cred_access_key_1_active", "value": "true" },
+      { "op": "or", "children": [
+        { "op": "not", "children": [ { "op": "fact_num", "fact": "cred_access_key_1_age_days", "cmp": "ge", "value": "0" } ] },
+        { "op": "and", "children": [
+          { "op": "fact_equals", "fact": "cred_access_key_1_never_used", "value": "false" },
+          { "op": "not", "children": [ { "op": "fact_num", "fact": "cred_access_key_1_last_used_age_days", "cmp": "ge", "value": "0" } ] }
+        ] }
+      ] }
+    ] },
+    { "op": "and", "children": [
+      { "op": "fact_equals", "fact": "cred_access_key_2_active", "value": "true" },
+      { "op": "or", "children": [
+        { "op": "not", "children": [ { "op": "fact_num", "fact": "cred_access_key_2_age_days", "cmp": "ge", "value": "0" } ] },
+        { "op": "and", "children": [
+          { "op": "fact_equals", "fact": "cred_access_key_2_never_used", "value": "false" },
+          { "op": "not", "children": [ { "op": "fact_num", "fact": "cred_access_key_2_last_used_age_days", "cmp": "ge", "value": "0" } ] }
+        ] }
+      ] }
+    ] }
+  ] },
+  "predicate": { "op": "or", "children": [
+    { "op": "and", "children": [
+      { "op": "fact_equals", "fact": "cred_access_key_1_active", "value": "true" },
+      { "op": "or", "children": [
+        { "op": "fact_num", "fact": "cred_access_key_1_last_used_age_days", "cmp": "gt", "value": "90" },
+        { "op": "and", "children": [
+          { "op": "fact_equals", "fact": "cred_access_key_1_never_used", "value": "true" },
+          { "op": "fact_num", "fact": "cred_access_key_1_age_days", "cmp": "gt", "value": "90" }
+        ] }
+      ] }
+    ] },
+    { "op": "and", "children": [
+      { "op": "fact_equals", "fact": "cred_access_key_2_active", "value": "true" },
+      { "op": "or", "children": [
+        { "op": "fact_num", "fact": "cred_access_key_2_last_used_age_days", "cmp": "gt", "value": "90" },
+        { "op": "and", "children": [
+          { "op": "fact_equals", "fact": "cred_access_key_2_never_used", "value": "true" },
+          { "op": "fact_num", "fact": "cred_access_key_2_age_days", "cmp": "gt", "value": "90" }
+        ] }
+      ] }
+    ] }
+  ] },
+  "requires": { "nodes": ["identity"], "completeness": ["iam.credentialReport"] },
+  "confidence": { "base": 80 }
+}

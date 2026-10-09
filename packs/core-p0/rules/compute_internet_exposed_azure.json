@@ -1,0 +1,12 @@
+{
+  "id": "CORE-P0-COMPUTE-INTERNET-EXPOSED-AZURE",
+  "version": "1",
+  "pack_id": "core-p0",
+  "severity": "high",
+  "title": "Virtual machine is exposed to the internet on all ports",
+  "detail": "A network security group allows an internet source across all ports, or the virtual machine has a Basic SKU public IP with no network security group (open by default). An internet source can therefore reach the machine on every port at the network layer. This is configuration exposure derived from the collected rules, not verified reachability.",
+  "selector": { "node_type": "compute", "predicate": { "op": "fact_equals", "fact": "exposure_provider", "value": "azure" } },
+  "predicate": { "op": "fact_equals", "fact": "internet_exposed_all_ports", "value": "true" },
+  "requires": { "nodes": ["compute"], "completeness": ["compute.virtualMachines", "network.networkInterfaces", "network.networkSecurityGroups", "network.publicIPAddresses", "network.virtualNetworks"] },
+  "confidence": { "base": 80 }
+}

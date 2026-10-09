@@ -1,0 +1,26 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:ittcsecscan:schema:model:exposure:v1",
+  "title": "Canonical exposure (effective reachability)",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "entity", "zone", "auth_required", "effective", "trace"],
+  "properties": {
+    "schema_version": { "$ref": "urn:ittcsecscan:schema:model:common:v1#/$defs/schema_version" },
+    "entity": { "$ref": "urn:ittcsecscan:schema:model:common:v1#/$defs/stable_id" },
+    "zone": { "type": "string", "description": "vocabulary deferred (blocker B-5)" },
+    "protocol": { "type": "integer", "minimum": 0, "maximum": 255 },
+    "ports": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["from", "to"],
+      "properties": {
+        "from": { "type": "integer", "minimum": 0, "maximum": 65535 },
+        "to": { "type": "integer", "minimum": 0, "maximum": 65535 }
+      }
+    },
+    "auth_required": { "$ref": "urn:ittcsecscan:schema:model:common:v1#/$defs/tri_state" },
+    "effective": { "$ref": "urn:ittcsecscan:schema:model:common:v1#/$defs/tri_state" },
+    "trace": { "type": "array", "items": { "type": "string" } }
+  }
+}

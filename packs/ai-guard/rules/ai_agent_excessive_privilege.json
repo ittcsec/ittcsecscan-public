@@ -1,0 +1,17 @@
+{
+  "id": "AIG-AGENT-EXCESSIVE-PRIVILEGE",
+  "version": "2",
+  "pack_id": "ai-guard",
+  "severity": "high",
+  "title": "AI agent has an excessive effective privilege",
+  "detail": "The role the agent assumes resolves to an administrative or otherwise over broad effective privilege (its attached and inline grants, after any permission boundary cap and explicit deny). An agent with excessive agency can take far more action than it needs, so a compromised or manipulated agent inherits that reach. The effective privilege is resolved deny evaluated by the engine and written onto the agent; it is never inferred from a name.",
+  "selector": { "node_type": "ai_agent" },
+  "predicate": { "op": "fact_in", "fact": "effective_privilege_level", "values": ["admin", "privileged"] },
+  "requires": {
+    "nodes": ["ai_agent"],
+    "completeness": ["bedrock.agents", "iam.identities"]
+  },
+  "confidence": { "base": 80, "factors": [
+    { "name": "admin_privilege", "when": { "op": "fact_equals", "fact": "effective_privilege_level", "value": "admin" }, "delta": 15 }
+  ] }
+}

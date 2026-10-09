@@ -1,0 +1,7 @@
+{
+  "schema_version": "permissions.v1",
+  "provider": "okta",
+  "profile": "remediation",
+  "verification": { "status": "unverified" },
+  "permissions": []
+}

@@ -1,0 +1,7 @@
+{
+  "schema_version": "permissions.v1",
+  "provider": "gcp",
+  "profile": "remediation",
+  "verification": { "status": "unverified" },
+  "permissions": []
+}

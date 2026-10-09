@@ -1,0 +1,310 @@
+# Release workflow for ittcsecscan: tag-triggered, reproducible, signed offline
+# (ADR-0009).
+#
+# For a tag vMAJOR.MINOR.PATCH[-pre] on a commit that is already on main:
+#   build    read-only token. Re-runs tests and govulncheck, builds every
+#            target twice from different directories and caches and requires
+#            identical checksums, then adds a CycloneDX SBOM per target, a SLSA
+#            v1 provenance statement over the binaries, the build info, and
+#            SHA256SUMS over all assets. It scans every asset with ClamAV; a
+#            detection or scan error fails the job (never a silent skip). No
+#            restored build cache is used. The provenance is offline-signed with
+#            everything else, since it is covered by SHA256SUMS.
+#   publish  contents: write, tags only. Verifies the checksums and creates
+#            an unsigned DRAFT release.
+# Then, on the maintainer's machine and never in CI, release/sign.sh rebuilds
+# every binary from the tagged commit, requires byte-identical results, and
+# signs SHA256SUMS with the offline release key. The maintainer uploads
+# SHA256SUMS.sig to the draft and runs this workflow by hand (workflow_dispatch,
+# from main):
+#   verify-and-publish  contents: write. Verifies the signature against main's
+#            release/keys/allowed_signers, every asset, and the build info on a
+#            clean runner, and publishes the draft only if asked and all pass.
+#
+# Pull requests that change release tooling run the build job as a dry run,
+# plus the whole signing procedure with a throwaway key.
+name: release
+
+on:
+  push:
+    tags: ["v*"]
+  pull_request:
+    paths:
+      - .github/workflows/release.yml
+      - release/**
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: "Release tag, for example v0.1.0. Its draft must already carry SHA256SUMS.sig."
+        required: true
+        type: string
+      publish:
+        description: "Publish the draft if every check passes (otherwise verify only)"
+        required: true
+        type: boolean
+        default: false
+
+permissions:
+  contents: read
+
+concurrency:
+  group: release-${{ github.ref }}
+  cancel-in-progress: false
+
+env:
+  GO_VERSION: "1.27.1"
+  GOTOOLCHAIN: local
+  # The product module is vendored (ADR-0017): the release builds from vendor/.
+  GOFLAGS: -mod=vendor
+  LC_ALL: C
+
+jobs:
+  build:
+    name: build and verify release artefacts
+    if: github.event_name != 'workflow_dispatch'
+    runs-on: ubuntu-24.04
+    # The release gates, a reproducible double build of every target, SBOM, SLSA provenance,
+    # and a ClamAV scan run here; a pull request adds a third full build under the throwaway-key
+    # signing check. Give that the headroom it needs (a real tag build omits the third build).
+    timeout-minutes: 75
+    outputs:
+      version: ${{ steps.version.outputs.version }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+          fetch-depth: 0 # full history: the tag is checked against main
+      - name: Reclaim runner disk
+        # This job builds every target twice, keeps a source copy and a second Go cache,
+        # fetches the ClamAV signature database, and (on pull requests) rebuilds a third
+        # time under the throwaway-key signing check. Remove the large preinstalled
+        # toolchains this job never uses so it does not exhaust the runner's disk.
+        run: |
+          df -h /
+          sudo rm -rf \
+            /usr/local/lib/android \
+            /usr/share/dotnet \
+            /opt/ghc \
+            /opt/hostedtoolcache/CodeQL \
+            /usr/local/share/powershell \
+            /usr/share/swift \
+            /usr/local/share/boost 2>/dev/null || true
+          df -h /
+      - name: Version from tag
+        id: version
+        env:
+          REF_TYPE: ${{ github.ref_type }}
+          REF_NAME: ${{ github.ref_name }}
+        run: |
+          if [ "$REF_TYPE" = tag ]; then
+            if ! printf '%s\n' "$REF_NAME" | grep -Eq '^v[0-9]+\.[0-9]+\.[0-9]+(-[0-9A-Za-z.]+)?$'; then
+              echo "tag $REF_NAME is not vMAJOR.MINOR.PATCH[-pre]" >&2
+              exit 1
+            fi
+            version="${REF_NAME#v}"
+          else
+            version=0.0.0-dryrun
+          fi
+          echo "version=$version" >> "$GITHUB_OUTPUT"
+      - name: Tagged commit is on main
+        if: github.ref_type == 'tag'
+        run: |
+          if ! git merge-base --is-ancestor "$GITHUB_SHA" origin/main; then
+            echo "the tag does not point to a commit on main" >&2
+            exit 1
+          fi
+      - uses: actions/setup-go@b7ad1dad31e06c5925ef5d2fc7ad053ef454303e # v7.0.0
+        with:
+          go-version: ${{ env.GO_VERSION }}
+          cache: false # release artefacts never depend on a restored cache
+      - name: Build pinned tools
+        run: ./tools/install.sh
+      - name: Release gate - tests
+        run: go test -count=1 ./...
+      - name: Release gate - known vulnerabilities
+        run: ./bin/govulncheck ./...
+      - name: Release gate - tenant schema fixtures (ADR-0012 §4)
+        run: sh release/check-schema-fixtures.sh
+      - name: Build twice and compare
+        env:
+          VERSION: ${{ steps.version.outputs.version }}
+        run: |
+          export SOURCE_DATE_EPOCH="$(git log -1 --format=%ct)"
+          ./release/build.sh "$VERSION" "$RUNNER_TEMP/dist"
+          cp -R . "$RUNNER_TEMP/src-b"
+          (cd "$RUNNER_TEMP/src-b" && GOCACHE="$RUNNER_TEMP/gocache-b" ./release/build.sh "$VERSION" "$RUNNER_TEMP/dist-b")
+          diff "$RUNNER_TEMP/dist/SHA256SUMS" "$RUNNER_TEMP/dist-b/SHA256SUMS"
+          echo "reproducible: both builds are identical"
+      - name: Reclaim space after the reproducibility check
+        # The second build's source copy, cache, and output exist only for the diff
+        # above. Drop them so the SBOM, provenance, ClamAV scan, and the throwaway-key
+        # signing rebuild have room. The canonical dist/ is kept.
+        run: rm -rf "$RUNNER_TEMP/src-b" "$RUNNER_TEMP/gocache-b" "$RUNNER_TEMP/dist-b"
+      - name: SBOM per target
+        env:
+          VERSION: ${{ steps.version.outputs.version }}
+        run: |
+          for target in linux/amd64 linux/arm64 darwin/amd64 darwin/arm64 windows/amd64 windows/arm64; do
+            goos="${target%/*}"; goarch="${target#*/}"
+            CGO_ENABLED=0 GOOS="$goos" GOARCH="$goarch" ./bin/cyclonedx-gomod app -json -licenses -noserial -notimestamp \
+              -main cmd/ittcsecscan -output "$RUNNER_TEMP/dist/ittcsecscan_${VERSION}_${goos}_${goarch}.cdx.json" .
+          done
+      - name: SLSA provenance (offline-signed via SHA256SUMS, ADR-0009)
+        env:
+          VERSION: ${{ steps.version.outputs.version }}
+          PROV_COMMIT: ${{ github.sha }}
+          PROV_REF: ${{ github.ref_name }}
+          PROV_RUN_ID: ${{ github.run_id }}
+          PROV_REPO: ${{ github.repository }}
+        run: sh release/provenance.sh "$VERSION" "$RUNNER_TEMP/dist"
+      - name: Malware scan (ClamAV) - a detection or scan error fails the release
+        # A detection, or any scan error (including failure to update signatures), fails
+        # the release job. A confirmed false positive is handled as a reviewed, recorded
+        # exception (release/README.md), never a silent skip.
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y clamav
+          sudo systemctl stop clamav-freshclam 2>/dev/null || true
+          sudo freshclam
+          clamscan --infected --recursive --no-summary "$RUNNER_TEMP/dist"
+          echo "malware scan: clean (no detections)"
+      - name: Checksums over all assets
+        run: sh release/checksums.sh "$RUNNER_TEMP/dist"
+      - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: release-assets
+          path: ${{ runner.temp }}/dist
+          if-no-files-found: error
+          retention-days: 30
+      - name: Signing procedure end to end (throwaway key, pull requests only)
+        if: github.event_name == 'pull_request'
+        run: |
+          key="$RUNNER_TEMP/throwaway_release"
+          ssh-keygen -q -t ed25519 -N '' -C throwaway -f "$key"
+          printf 'ittcsecscan-release namespaces="ittcsecscan-release" %s\n' "$(cut -d' ' -f1,2 "$key.pub")" > "$RUNNER_TEMP/throwaway_signers"
+          cp -R "$RUNNER_TEMP/dist" "$RUNNER_TEMP/signtest"
+          sh release/sign.sh --allowed-signers "$RUNNER_TEMP/throwaway_signers" "$RUNNER_TEMP/signtest" "$key"
+
+  publish:
+    name: create draft release (unsigned until signed offline)
+    needs: build
+    if: github.ref_type == 'tag'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
+        with:
+          name: release-assets
+          path: dist
+      - name: Verify checksums
+        working-directory: dist
+        run: sha256sum -c SHA256SUMS
+      - name: Release notes
+        env:
+          VERSION: ${{ needs.build.outputs.version }}
+          COMMIT: ${{ github.sha }}
+        run: |
+          {
+            echo "ittcsecscan $VERSION, built from commit $COMMIT."
+            echo
+            echo "**Draft, not signed yet. Do not publish this draft by hand.** The maintainer rebuilds and signs it offline with \`release/sign.sh\`, uploads \`SHA256SUMS.sig\`, and publishes it through the release workflow's verify-and-publish run (release/README.md)."
+            echo
+            echo '```'
+            cat dist/SHA256SUMS
+            echo '```'
+          } > notes.md
+      - name: Create draft release
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TAG: ${{ github.ref_name }}
+          REPO: ${{ github.repository }}
+          VERSION: ${{ needs.build.outputs.version }}
+        run: |
+          prerelease=
+          case "$VERSION" in *-*) prerelease=--prerelease ;; esac
+          gh release create "$TAG" dist/* --repo "$REPO" --draft $prerelease --verify-tag --title "ittcsecscan $TAG" --notes-file notes.md
+
+  verify-and-publish:
+    name: verify signed draft, publish if requested
+    if: github.event_name == 'workflow_dispatch'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    permissions:
+      contents: write # drafts are only readable with write access; publishing needs it too
+    steps:
+      - name: Dispatched from main
+        if: github.ref != 'refs/heads/main'
+        run: |
+          echo "run this from main: the trust root is main's release/keys/allowed_signers" >&2
+          exit 1
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+          fetch-depth: 0 # tags and main, to check where the tag points
+      - name: Tag is well formed and on main
+        id: tag
+        env:
+          TAG: ${{ inputs.tag }}
+        run: |
+          if ! printf '%s\n' "$TAG" | grep -Eqx 'v[0-9]+\.[0-9]+\.[0-9]+(-[0-9A-Za-z.]+)?'; then
+            echo "not a release tag: $TAG" >&2
+            exit 1
+          fi
+          commit="$(git rev-parse --verify "refs/tags/$TAG^{commit}")"
+          if ! git merge-base --is-ancestor "$commit" origin/main; then
+            echo "$TAG does not point to a commit on main" >&2
+            exit 1
+          fi
+          echo "commit=$commit" >> "$GITHUB_OUTPUT"
+      - name: Download the draft
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TAG: ${{ inputs.tag }}
+          REPO: ${{ github.repository }}
+        run: |
+          draft="$(gh release view "$TAG" --repo "$REPO" --json isDraft --jq .isDraft)"
+          if [ "$draft" != true ]; then
+            echo "release $TAG is not a draft" >&2
+            exit 1
+          fi
+          gh release download "$TAG" --repo "$REPO" --dir "$RUNNER_TEMP/release"
+          ls -l "$RUNNER_TEMP/release"
+      - name: Verify signature, assets, and build info
+        env:
+          TAG: ${{ inputs.tag }}
+          COMMIT: ${{ steps.tag.outputs.commit }}
+        run: |
+          sh release/verify.sh "$RUNNER_TEMP/release"
+          info="$RUNNER_TEMP/release/ittcsecscan_${TAG#v}_buildinfo.txt"
+          grep -qx "version=${TAG#v}" "$info"
+          grep -qx "commit=$COMMIT" "$info"
+          grep -qx "tree_state=clean" "$info"
+          echo "verified: $TAG is commit $COMMIT, signed with the release key"
+      - name: Publish
+        if: inputs.publish
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TAG: ${{ inputs.tag }}
+          REPO: ${{ github.repository }}
+          COMMIT: ${{ steps.tag.outputs.commit }}
+        run: |
+          fingerprint="$(grep -Ev '^[[:space:]]*(#|$)' release/keys/allowed_signers | cut -d' ' -f3,4 | ssh-keygen -l -f - | cut -d' ' -f2 | paste -sd ' ')"
+          {
+            echo "ittcsecscan ${TAG#v}, built from commit $COMMIT."
+            echo
+            echo "Signed offline with the ittcsecscan release key ($fingerprint), after the binaries were independently rebuilt and matched byte for byte (ADR-0009). \`SHA256SUMS.sig\` is an OpenSSH signature over \`SHA256SUMS\`, which lists every binary, SBOM, and the build info."
+            echo
+            echo "To verify, put the files you downloaded, \`SHA256SUMS\`, and \`SHA256SUMS.sig\` in one folder, then run from a clone of this repository's \`main\` branch (OpenSSH 8.1 or later; Git Bash on Windows):"
+            echo
+            echo '```sh'
+            echo 'release/verify.sh --partial FOLDER'
+            echo '```'
+            echo
+            echo '```'
+            cat "$RUNNER_TEMP/release/SHA256SUMS"
+            echo '```'
+          } > notes.md
+          gh release edit "$TAG" --repo "$REPO" --draft=false --notes-file notes.md
+          echo "published $TAG"

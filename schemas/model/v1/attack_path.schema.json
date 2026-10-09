@@ -1,0 +1,28 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:ittcsecscan:schema:model:attack_path:v1",
+  "title": "Canonical attack path",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "entry", "target", "score", "confidence", "steps"],
+  "properties": {
+    "schema_version": { "$ref": "urn:ittcsecscan:schema:model:common:v1#/$defs/schema_version" },
+    "entry": { "$ref": "urn:ittcsecscan:schema:model:common:v1#/$defs/stable_id" },
+    "target": { "$ref": "urn:ittcsecscan:schema:model:common:v1#/$defs/stable_id" },
+    "score": { "type": "integer", "minimum": 0 },
+    "confidence": { "$ref": "urn:ittcsecscan:schema:model:common:v1#/$defs/confidence" },
+    "steps": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["node", "via"],
+        "properties": {
+          "node": { "$ref": "urn:ittcsecscan:schema:model:common:v1#/$defs/stable_id" },
+          "via": { "$ref": "urn:ittcsecscan:schema:model:common:v1#/$defs/edge_kind" },
+          "technique": { "type": "string" }
+        }
+      }
+    }
+  }
+}

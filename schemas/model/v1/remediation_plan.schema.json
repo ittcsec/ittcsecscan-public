@@ -1,0 +1,48 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:ittcsecscan:schema:model:remediation_plan:v1",
+  "title": "Canonical remediation plan",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "finding", "entity", "available", "reversible"],
+  "properties": {
+    "schema_version": { "$ref": "urn:ittcsecscan:schema:model:common:v1#/$defs/schema_version" },
+    "finding": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["rule_id", "version", "pack_id"],
+      "properties": {
+        "rule_id": { "type": "string" },
+        "version": { "type": "string" },
+        "pack_id": { "type": "string" }
+      }
+    },
+    "entity": { "$ref": "urn:ittcsecscan:schema:model:common:v1#/$defs/stable_id" },
+    "available": { "type": "boolean" },
+    "gap_reason": { "type": "string" },
+    "actions": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["provider", "service", "summary"],
+        "properties": {
+          "provider": { "$ref": "urn:ittcsecscan:schema:model:common:v1#/$defs/provider" },
+          "service": { "type": "string" },
+          "summary": { "type": "string" },
+          "portal_steps": { "type": "array", "items": { "type": "string" } },
+          "cli": { "type": "array", "items": { "type": "string" } },
+          "iac": { "type": "string" },
+          "privilege": { "type": "array", "items": { "type": "string" } }
+        }
+      }
+    },
+    "preconditions": { "type": "array", "items": { "type": "string" } },
+    "required_privilege": { "type": "array", "items": { "type": "string" } },
+    "side_effects": { "type": "array", "items": { "type": "string" } },
+    "approvals": { "type": "array", "items": { "type": "string" } },
+    "verification": { "type": "array", "items": { "type": "string" } },
+    "reversible": { "type": "boolean" },
+    "rollback": { "type": "array", "items": { "type": "string" } }
+  }
+}

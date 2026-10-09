@@ -1,0 +1,67 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:ittcsecscan:schema:model:common:v1",
+  "title": "Shared definitions for the canonical model (ADR-0014)",
+  "description": "Reusable shapes referenced by the model document schemas. Never validated against directly.",
+  "$defs": {
+    "schema_version": { "const": 1 },
+    "stable_id": {
+      "description": "Tenant-scoped identity: the hex of a 32-byte HMAC (ADR-0010).",
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "confidence": { "type": "integer", "minimum": 0, "maximum": 100 },
+    "timestamp": { "type": "string", "format": "date-time" },
+    "provider": { "enum": ["aws", "azure", "gcp", "github", "gitlab", "kubernetes", "okta", "google_workspace", "mcp"] },
+    "node_type": {
+      "enum": [
+        "account", "subscription", "project", "organization", "tenant",
+        "identity", "group", "role", "policy", "credential", "token",
+        "workload", "compute", "network", "endpoint", "gateway", "api",
+        "data_store", "secret_store", "repository", "pipeline", "artifact",
+        "cluster", "namespace", "service", "ai_model", "ai_agent",
+        "mcp_server", "tool", "endpoint_device", "vulnerability", "control",
+        "business_asset"
+      ]
+    },
+    "edge_kind": {
+      "enum": [
+        "member_of", "assumes", "can_impersonate", "can_create_credential",
+        "can_modify_policy", "can_execute_on", "can_read", "can_write",
+        "can_delete", "can_exfiltrate", "exposed_to", "routes_to",
+        "resolves_to", "trusts", "federates_with", "deploys", "builds",
+        "contains_secret", "accesses_data", "invokes_tool", "controls_agent",
+        "bypasses_control", "monitored_by", "protected_by", "contains"
+      ]
+    },
+    "outcome": { "enum": ["pass", "fail", "unknown", "error", "not_applicable"] },
+    "scan_status": { "enum": ["running", "completed", "failed", "incomplete"] },
+    "freshness": { "enum": ["fresh", "stale", "unknown"] },
+    "completeness": { "enum": ["complete", "partial", "unknown"] },
+    "tri_state": { "enum": ["no", "yes", "unknown"] },
+    "condition": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["key", "operator", "values"],
+      "properties": {
+        "key": { "type": "string" },
+        "operator": { "type": "string" },
+        "values": { "type": "array", "items": { "type": "string" } }
+      }
+    },
+    "evidence": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["schema_version", "collector", "api", "observed_at", "value", "freshness", "completeness"],
+      "properties": {
+        "schema_version": { "$ref": "#/$defs/schema_version" },
+        "collector": { "type": "string" },
+        "api": { "type": "string" },
+        "observed_at": { "$ref": "#/$defs/timestamp" },
+        "value": { "type": "string" },
+        "freshness": { "$ref": "#/$defs/freshness" },
+        "completeness": { "$ref": "#/$defs/completeness" }
+      }
+    }
+  }
+}

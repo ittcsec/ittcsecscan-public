@@ -1,0 +1,28 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:ittcsecscan:schema:model:finding:v1",
+  "title": "Canonical finding",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "rule", "entity", "state", "risk", "confidence", "first_seen", "status"],
+  "properties": {
+    "schema_version": { "$ref": "urn:ittcsecscan:schema:model:common:v1#/$defs/schema_version" },
+    "rule": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["rule_id", "version", "pack_id"],
+      "properties": {
+        "rule_id": { "type": "string" },
+        "version": { "type": "string" },
+        "pack_id": { "type": "string" }
+      }
+    },
+    "entity": { "$ref": "urn:ittcsecscan:schema:model:common:v1#/$defs/stable_id" },
+    "state": { "$ref": "urn:ittcsecscan:schema:model:common:v1#/$defs/outcome" },
+    "risk": { "type": "integer", "minimum": 0 },
+    "confidence": { "$ref": "urn:ittcsecscan:schema:model:common:v1#/$defs/confidence" },
+    "first_seen": { "$ref": "urn:ittcsecscan:schema:model:common:v1#/$defs/timestamp" },
+    "status": { "type": "string", "description": "vocabulary deferred (blocker B-5)" },
+    "detail": { "type": "string" }
+  }
+}

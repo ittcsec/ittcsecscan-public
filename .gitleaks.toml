@@ -1,0 +1,20 @@
+# gitleaks configuration: the default rule set plus path exclusions for build
+# output. Test credentials in this repository are assembled at run time (see
+# internal/redact/redact_test.go), so no allow-listing of source is needed.
+title = "ittcsecscan"
+
+[extend]
+useDefault = true
+
+[[allowlists]]
+description = "Pinned tool binaries and release output are not source"
+paths = [
+  '''^bin[\\/]''',
+  '''^dist[\\/]''',
+]
+
+[[allowlists]]
+description = "Vendored third-party dependencies are not our source. Their integrity is pinned by go.sum and the Go checksum database; this scan exists to catch secrets we add. Machine-generated code (for example modernc.org/sqlite's C translation) trips high-entropy rules."
+paths = [
+  '''^vendor[\\/]''',
+]

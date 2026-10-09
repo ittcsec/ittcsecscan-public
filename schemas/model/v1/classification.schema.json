@@ -1,0 +1,16 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:ittcsecscan:schema:model:classification:v1",
+  "title": "Canonical classification (sensitive-asset label)",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "entity", "label", "method", "confidence"],
+  "properties": {
+    "schema_version": { "$ref": "urn:ittcsecscan:schema:model:common:v1#/$defs/schema_version" },
+    "entity": { "$ref": "urn:ittcsecscan:schema:model:common:v1#/$defs/stable_id" },
+    "label": { "type": "string" },
+    "method": { "type": "string" },
+    "confidence": { "$ref": "urn:ittcsecscan:schema:model:common:v1#/$defs/confidence" },
+    "approved_sample": { "type": "string" }
+  }
+}

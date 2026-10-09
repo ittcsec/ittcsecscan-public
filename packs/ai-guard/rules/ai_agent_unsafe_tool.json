@@ -1,0 +1,30 @@
+{
+  "id": "AIG-TOOL-UNSAFE",
+  "version": "1",
+  "pack_id": "ai-guard",
+  "severity": "high",
+  "title": "AI agent can invoke a high-privilege tool",
+  "detail": "The agent is configured to invoke an enabled tool that executes code or runs in another account. A code interpreter lets the agent run generated code, and a cross account executor runs the tool outside the agent's own account. Either expands what the agent can do beyond answering, so a compromised or manipulated agent can act through the tool.",
+  "selector": { "node_type": "ai_agent" },
+  "predicate": { "op": "has_edge", "edge": "invokes_tool", "target": {
+    "node_type": "tool",
+    "predicate": { "op": "and", "children": [
+      { "op": "fact_equals", "fact": "state", "value": "enabled" },
+      { "op": "or", "children": [
+        { "op": "fact_equals", "fact": "code_execution", "value": "true" },
+        { "op": "fact_equals", "fact": "cross_account", "value": "true" }
+      ] }
+    ] }
+  } },
+  "requires": {
+    "nodes": ["ai_agent", "tool"],
+    "edges": ["invokes_tool"],
+    "completeness": ["bedrock.agents", "bedrock.actionGroups"]
+  },
+  "confidence": { "base": 75, "factors": [
+    { "name": "code_execution_tool", "when": { "op": "has_edge", "edge": "invokes_tool", "target": {
+      "node_type": "tool", "predicate": { "op": "fact_equals", "fact": "code_execution", "value": "true" } } }, "delta": 15 },
+    { "name": "cross_account_tool", "when": { "op": "has_edge", "edge": "invokes_tool", "target": {
+      "node_type": "tool", "predicate": { "op": "fact_equals", "fact": "cross_account", "value": "true" } } }, "delta": 10 }
+  ] }
+}

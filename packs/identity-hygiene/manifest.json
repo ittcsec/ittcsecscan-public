@@ -1,0 +1,67 @@
+{
+  "schema_version": 1,
+  "pack_id": "identity-hygiene",
+  "version": "1.0.0",
+  "engine_min": 1,
+  "engine_max": 1,
+  "providers": [
+    "aws",
+    "azure",
+    "gcp"
+  ],
+  "domains": [
+    "identity hygiene"
+  ],
+  "rules": [
+    {
+      "id": "IDH-AWS-IAM-USER-NO-MFA",
+      "file": "rules/aws_iam_user_no_mfa.json",
+      "digest": "90afe66e467caa63e1b30c1885b7ce1aaee85444bee7f24567cedf37061c8547"
+    },
+    {
+      "id": "IDH-AWS-IAM-KEY-UNUSED",
+      "file": "rules/aws_iam_key_unused.json",
+      "digest": "9c7143bd4f86f8ad20d74204d82a8f3f34361ffc96d590fe8a2c99b7ea9cf5c1"
+    },
+    {
+      "id": "IDH-AWS-IAM-KEY-UNROTATED",
+      "file": "rules/aws_iam_key_unrotated.json",
+      "digest": "8618cf82273a2aa595c054599fa4a1660682e9d72a00fd0282be7d47a1caccee"
+    },
+    {
+      "id": "IDH-AWS-ROOT-KEY-ACTIVE",
+      "file": "rules/aws_root_key_active.json",
+      "digest": "f6363080068e911897462b3e896d4c1614b8a0290b39e1d030378a83cb918dc9"
+    },
+    {
+      "id": "IDH-AWS-ROOT-NO-MFA",
+      "file": "rules/aws_root_no_mfa.json",
+      "digest": "191e1ba02663db31f05eca836c8239d2f1f2e1ceeaa6f65f8f44ce2b440729fa"
+    },
+    {
+      "id": "IDH-AWS-ROLE-DORMANT",
+      "file": "rules/aws_role_dormant.json",
+      "digest": "100a4de332ef0371b7b5ed15c0da19e49f5626e6246260b10b9ab1c3159ca486"
+    },
+    {
+      "id": "IDH-AZURE-APP-CRED-EXPIRED",
+      "file": "rules/azure_app_cred_expired.json",
+      "digest": "73d43fc6eda72767b4785272960a301dedfd0dd8478b443806590df25156642c"
+    },
+    {
+      "id": "IDH-AZURE-APP-CRED-LONG-LIFETIME",
+      "file": "rules/azure_app_cred_long_lifetime.json",
+      "digest": "b4ad0baa1db101909485f0826cfcdc24f4d453494d578b5d63571c1cb1b31350"
+    },
+    {
+      "id": "IDH-AZURE-APP-HIGH-PRIV-GRANT",
+      "file": "rules/azure_app_high_priv_grant.json",
+      "digest": "5206647275caf18a0d28e05f6905bc700194244d39901c67454afb6af65d4d25"
+    },
+    {
+      "id": "IDH-GCP-SA-KEY-OLD",
+      "file": "rules/gcp_sa_key_old.json",
+      "digest": "52a74a0e791371808d70a8742cfa9dd62b3ae765ed2610cc28168aa6aac0cf5b"
+    }
+  ]
+}

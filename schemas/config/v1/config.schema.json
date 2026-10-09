@@ -1,0 +1,44 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:ittcsecscan:schema:config:v1",
+  "title": "ittcsecscan configuration file",
+  "description": "Operator configuration for ittcsecscan. The file never holds credentials: cloud access always comes from the provider's native credential chain. Unknown keys are rejected so that typos and misplaced secrets fail loudly instead of being ignored.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version"],
+  "properties": {
+    "schema_version": {
+      "description": "Version of this configuration schema. Only 1 is defined.",
+      "const": 1
+    },
+    "log": {
+      "description": "Diagnostic logging. Logs are written to stderr and are always redacted.",
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "level": {
+          "description": "Minimum level emitted.",
+          "enum": ["debug", "info", "warn", "error"],
+          "default": "info"
+        },
+        "format": {
+          "description": "Log encoding.",
+          "enum": ["text", "json"],
+          "default": "text"
+        }
+      }
+    },
+    "data_dir": {
+      "description": "Absolute path of the local data directory (store, snapshots, reports). Defaults to the platform's per-user application data directory.",
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 4096
+    },
+    "master_key_file": {
+      "description": "Absolute path of the operator's passphrase-wrapped master-key file (ADR-0015). The path only, never the key. Must lie outside data_dir. Empty means no key file is configured.",
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 4096
+    }
+  }
+}

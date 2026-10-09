@@ -1,0 +1,31 @@
+{
+  "id": "IDH-AWS-IAM-KEY-UNROTATED",
+  "version": "1",
+  "pack_id": "identity-hygiene",
+  "severity": "medium",
+  "title": "Active IAM access key is not rotated",
+  "detail": "An active IAM access key has not been rotated (created) in over 90 days. Long-lived static keys should be rotated regularly to limit the window a leaked key is useful. The 90-day threshold lives in this signed rule; the key age in days is a collected fact. A key whose age is undeterminable is reported not assessed, never passed.",
+  "selector": { "node_type": "identity", "predicate": { "op": "fact_equals", "fact": "credential_report", "value": "true" } },
+  "indeterminate": { "op": "or", "children": [
+    { "op": "and", "children": [
+      { "op": "fact_equals", "fact": "cred_access_key_1_active", "value": "true" },
+      { "op": "not", "children": [ { "op": "fact_num", "fact": "cred_access_key_1_age_days", "cmp": "ge", "value": "0" } ] }
+    ] },
+    { "op": "and", "children": [
+      { "op": "fact_equals", "fact": "cred_access_key_2_active", "value": "true" },
+      { "op": "not", "children": [ { "op": "fact_num", "fact": "cred_access_key_2_age_days", "cmp": "ge", "value": "0" } ] }
+    ] }
+  ] },
+  "predicate": { "op": "or", "children": [
+    { "op": "and", "children": [
+      { "op": "fact_equals", "fact": "cred_access_key_1_active", "value": "true" },
+      { "op": "fact_num", "fact": "cred_access_key_1_age_days", "cmp": "gt", "value": "90" }
+    ] },
+    { "op": "and", "children": [
+      { "op": "fact_equals", "fact": "cred_access_key_2_active", "value": "true" },
+      { "op": "fact_num", "fact": "cred_access_key_2_age_days", "cmp": "gt", "value": "90" }
+    ] }
+  ] },
+  "requires": { "nodes": ["identity"], "completeness": ["iam.credentialReport"] },
+  "confidence": { "base": 75 }
+}

@@ -1,0 +1,23 @@
+{
+  "schema_version": "permissions.v1",
+  "provider": "google_workspace",
+  "profile": "discovery",
+  "verification": { "status": "unverified" },
+  "permissions": [
+    {
+      "permission": "admin.directory.user.readonly",
+      "enabled_by": ["collector:google_workspace.users"],
+      "verification": { "status": "unverified" }
+    },
+    {
+      "permission": "admin.directory.group.readonly",
+      "enabled_by": ["collector:google_workspace.groups"],
+      "verification": { "status": "unverified" }
+    },
+    {
+      "permission": "admin.directory.group.member.readonly",
+      "enabled_by": ["collector:google_workspace.groups"],
+      "verification": { "status": "unverified" }
+    }
+  ]
+}

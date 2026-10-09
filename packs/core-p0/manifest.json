@@ -1,0 +1,79 @@
+{
+  "schema_version": 1,
+  "pack_id": "core-p0",
+  "version": "1.0.0",
+  "engine_min": 1,
+  "engine_max": 1,
+  "providers": [
+    "aws",
+    "azure",
+    "gcp"
+  ],
+  "domains": [
+    "object storage",
+    "databases",
+    "key management"
+  ],
+  "rules": [
+    {
+      "id": "CORE-P0-STORAGE-PUBLIC-AWS",
+      "file": "rules/storage_public_aws.json",
+      "digest": "aace514109761ee8cfbd6e270b4a5c285157690b98289c10e787bac7c9f1645a"
+    },
+    {
+      "id": "CORE-P0-STORAGE-PUBLIC-GCP",
+      "file": "rules/storage_public_gcp.json",
+      "digest": "7a543e3a58fca330bf8d9c8ad6cc8ccee7884b569632d0464f95d1c3d1b2db0a"
+    },
+    {
+      "id": "CORE-P0-STORAGE-PUBLIC-AZURE",
+      "file": "rules/storage_public_azure.json",
+      "digest": "5d0343e43ca63b65ee958d8f06b5b5801cbeecff46e187a893c4e83eadca77cb"
+    },
+    {
+      "id": "CORE-P0-DATABASE-PUBLIC-AWS",
+      "file": "rules/database_public_aws.json",
+      "digest": "11e68dc87c9aa611bfbe8924f93351c3060144529f99b71aebca019ff8dc0c7d"
+    },
+    {
+      "id": "CORE-P0-DATABASE-PUBLIC-AZURE",
+      "file": "rules/database_public_azure.json",
+      "digest": "f10e79b198dc05295aeeb8a4df4979381c5d9d568c6bb89d148be9b3dab95b8b"
+    },
+    {
+      "id": "CORE-P0-DATABASE-PUBLIC-GCP",
+      "file": "rules/database_public_gcp.json",
+      "digest": "6b2a58753eb54621fc310da0e6299864b90878bd620c8c78b85816dc0a70a838"
+    },
+    {
+      "id": "CORE-P0-KMS-ROTATION-AWS",
+      "file": "rules/kms_rotation_aws.json",
+      "digest": "5f51beaa575dc1f00fbb2cb5cc05c50422059eb1c45808183a348e9ec09195b8"
+    },
+    {
+      "id": "CORE-P0-KMS-ROTATION-GCP",
+      "file": "rules/kms_rotation_gcp.json",
+      "digest": "89b1a6a3417a4e2e959495a35aa9dbc20a685c61a8a7acc3c8588c6457ffb7a0"
+    },
+    {
+      "id": "CORE-P0-KEYVAULT-PURGE-AZURE",
+      "file": "rules/keyvault_purge_azure.json",
+      "digest": "4aa11e997f124242af7ff158116c1c634b46f98905e6702779ec15b24f79c39d"
+    },
+    {
+      "id": "CORE-P0-COMPUTE-INTERNET-EXPOSED-AWS",
+      "file": "rules/compute_internet_exposed_aws.json",
+      "digest": "0de54322fd18812248a98c5409d98149b448ea8472a3a6910fc6b6dc01c4cd13"
+    },
+    {
+      "id": "CORE-P0-COMPUTE-INTERNET-EXPOSED-AZURE",
+      "file": "rules/compute_internet_exposed_azure.json",
+      "digest": "35585aec614edf80a1ac33ab77cff184debe075ffb1620c50e9b521d3c579296"
+    },
+    {
+      "id": "CORE-P0-COMPUTE-INTERNET-EXPOSED-GCP",
+      "file": "rules/compute_internet_exposed_gcp.json",
+      "digest": "fe3f78b24d19702411f28b1e02d2052428cda38edc8b61197cca59849eb03d85"
+    }
+  ]
+}

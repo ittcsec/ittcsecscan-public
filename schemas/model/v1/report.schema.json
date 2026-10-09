@@ -1,0 +1,274 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:ittcsecscan:schema:model:report:v1",
+  "title": "ittcsecscan immutable report model",
+  "description": "The single source of truth every report format is rendered from (ADR-0028). Coverage precedes findings. Every string is redacted and free of em and en dashes. Remediation is an honest named gap until the remediation engine exists.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "tenant", "tool_version", "coverage", "findings", "paths", "cuts", "classifications", "identity", "changes", "compliance", "remediation", "hash"],
+  "properties": {
+    "schema_version": { "const": 1 },
+    "tenant": { "type": "string" },
+    "tool_version": { "type": "string" },
+    "started": { "type": "string" },
+    "completed": { "type": "string" },
+    "coverage": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["complete", "providers", "gaps"],
+      "properties": {
+        "complete": { "type": "boolean" },
+        "gaps": { "type": "array", "items": { "type": "string" } },
+        "providers": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["provider", "authenticated", "records"],
+            "properties": {
+              "provider": { "type": "string" },
+              "account": { "type": "string" },
+              "authenticated": { "type": "boolean" },
+              "auth_error": { "type": "string" },
+              "records": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "required": ["service", "region", "status", "collected"],
+                  "properties": {
+                    "service": { "type": "string" },
+                    "region": { "type": "string" },
+                    "status": { "enum": ["complete", "partial", "denied", "unsupported", "error"] },
+                    "collected": { "type": "integer", "minimum": 0 },
+                    "reason": { "type": "string" }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "findings": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["rule", "entity", "state", "risk", "confidence", "risk_basis", "evidence", "remediation"],
+        "properties": {
+          "rule": { "type": "string" },
+          "entity": { "type": "string" },
+          "entity_name": { "type": "string" },
+          "state": { "enum": ["fail", "unknown", "error", "pass"] },
+          "risk": { "type": "integer", "minimum": 0 },
+          "confidence": { "type": "integer", "minimum": 0 },
+          "risk_basis": { "type": "array", "items": { "type": "string" } },
+          "evidence": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "nodes": { "type": "array", "items": { "type": "string" } },
+              "edges": { "type": "array", "items": { "type": "string" } },
+              "facts": { "type": "array", "items": { "type": "string" } }
+            }
+          },
+          "trace": { "type": "array", "items": { "type": "string" } },
+          "detail": { "type": "string" },
+          "remediation": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["available", "statement", "reversible"],
+            "properties": {
+              "available": { "type": "boolean" },
+              "statement": { "type": "string" },
+              "actions": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "required": ["provider", "service", "summary"],
+                  "properties": {
+                    "provider": { "type": "string" },
+                    "service": { "type": "string" },
+                    "summary": { "type": "string" },
+                    "portal_steps": { "type": "array", "items": { "type": "string" } },
+                    "cli": { "type": "array", "items": { "type": "string" } },
+                    "iac": { "type": "string" },
+                    "privilege": { "type": "array", "items": { "type": "string" } }
+                  }
+                }
+              },
+              "preconditions": { "type": "array", "items": { "type": "string" } },
+              "required_privilege": { "type": "array", "items": { "type": "string" } },
+              "side_effects": { "type": "array", "items": { "type": "string" } },
+              "verification": { "type": "array", "items": { "type": "string" } },
+              "reversible": { "type": "boolean" },
+              "rollback": { "type": "array", "items": { "type": "string" } },
+              "plan_hash": { "type": "string" }
+            }
+          }
+        }
+      }
+    },
+    "paths": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["entry", "target", "risk", "score", "confidence", "risk_basis", "steps"],
+        "properties": {
+          "entry": { "type": "string" },
+          "target": { "type": "string" },
+          "risk": { "type": "integer", "minimum": 0 },
+          "score": { "type": "integer", "minimum": 0 },
+          "confidence": { "type": "integer", "minimum": 0 },
+          "risk_basis": { "type": "array", "items": { "type": "string" } },
+          "steps": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": ["node"],
+              "properties": {
+                "node": { "type": "string" },
+                "via": { "type": "string" },
+                "technique": { "type": "string" }
+              }
+            }
+          }
+        }
+      }
+    },
+    "cuts": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["kind", "source", "target", "description", "paths_removed", "risk_reduction", "effort", "disruption"],
+        "properties": {
+          "kind": { "type": "string" },
+          "source": { "type": "string" },
+          "target": { "type": "string" },
+          "description": { "type": "string" },
+          "paths_removed": { "type": "integer", "minimum": 0 },
+          "risk_reduction": { "type": "integer", "minimum": 0 },
+          "effort": { "type": "integer", "minimum": 0 },
+          "disruption": { "type": "integer", "minimum": 0 }
+        }
+      }
+    },
+    "classifications": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["entity", "sensitivity", "confidence", "method"],
+        "properties": {
+          "entity": { "type": "string" },
+          "sensitivity": { "enum": ["high", "moderate", "low", "unknown"] },
+          "confidence": { "type": "integer", "minimum": 0 },
+          "method": { "type": "string" }
+        }
+      }
+    },
+    "identity": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["grants", "complete", "gaps", "dormant_status"],
+      "properties": {
+        "grants": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["principal", "privilege", "effect"],
+            "properties": {
+              "principal": { "type": "string" },
+              "privilege": { "type": "string" },
+              "effect": { "type": "string" },
+              "via": { "type": "array", "items": { "type": "string" } }
+            }
+          }
+        },
+        "complete": { "type": "boolean" },
+        "gaps": { "type": "array", "items": { "type": "string" } },
+        "dormant_status": { "type": "string" }
+      }
+    },
+    "changes": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["scan_id", "entities", "edges"],
+      "properties": {
+        "scan_id": { "type": "integer", "minimum": 0 },
+        "entities": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["change", "type", "entity"],
+            "properties": {
+              "change": { "type": "string" },
+              "type": { "type": "string" },
+              "entity": { "type": "string" },
+              "name": { "type": "string" }
+            }
+          }
+        },
+        "edges": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["change", "kind", "source", "target"],
+            "properties": {
+              "change": { "type": "string" },
+              "kind": { "type": "string" },
+              "source": { "type": "string" },
+              "target": { "type": "string" }
+            }
+          }
+        }
+      }
+    },
+    "compliance": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["frameworks"],
+      "properties": {
+        "frameworks": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["framework", "version", "effective_date", "failed", "passed", "not_assessed", "controls"],
+            "properties": {
+              "framework": { "type": "string" },
+              "version": { "type": "string" },
+              "effective_date": { "type": "string" },
+              "failed": { "type": "integer", "minimum": 0 },
+              "passed": { "type": "integer", "minimum": 0 },
+              "not_assessed": { "type": "integer", "minimum": 0 },
+              "controls": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "required": ["control", "status"],
+                  "properties": {
+                    "control": { "type": "string" },
+                    "status": { "type": "string", "enum": ["fail", "pass", "not_assessed"] },
+                    "rules": { "type": "array", "items": { "type": "string" } }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "remediation": { "type": "string" },
+    "hash": { "type": "string", "pattern": "^[0-9a-f]{64}$" }
+  }
+}

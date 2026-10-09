@@ -1,0 +1,53 @@
+[
+  {
+    "rule": {
+      "rule_id": "TEST-STORAGE-PUBLIC",
+      "version": "1",
+      "pack_id": "test"
+    },
+    "entity_id": "//b/priv",
+    "entity_type": "data_store",
+    "state": "pass",
+    "confidence": 90,
+    "confidence_basis": [
+      "base(90)"
+    ],
+    "grounding": {
+      "nodes": [
+        "//b/priv"
+      ],
+      "completeness": [
+        "storage.bucketIam:complete"
+      ]
+    },
+    "trace": null
+  },
+  {
+    "rule": {
+      "rule_id": "TEST-STORAGE-PUBLIC",
+      "version": "1",
+      "pack_id": "test"
+    },
+    "entity_id": "//b/pub",
+    "entity_type": "data_store",
+    "state": "fail",
+    "confidence": 95,
+    "confidence_basis": [
+      "direct_iam_binding(+5)"
+    ],
+    "grounding": {
+      "nodes": [
+        "//b/pub"
+      ],
+      "facts": [
+        "iam_all_users_roles=roles/viewer on //b/pub"
+      ],
+      "completeness": [
+        "storage.bucketIam:complete"
+      ]
+    },
+    "trace": [
+      "data_store //b/pub: fact iam_all_users_roles=\"roles/viewer\""
+    ]
+  }
+]

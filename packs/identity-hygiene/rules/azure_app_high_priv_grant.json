@@ -1,0 +1,29 @@
+{
+  "id": "IDH-AZURE-APP-HIGH-PRIV-GRANT",
+  "version": "1",
+  "pack_id": "identity-hygiene",
+  "severity": "high",
+  "title": "Service principal holds a high-impact Microsoft Graph permission",
+  "detail": "A service principal has been granted a Microsoft Graph application permission from the high-impact set (directory, role-management, application, consent, authentication-method and site-control write permissions). These permissions let an app read or rewrite the tenant's directory, roles, apps or consent, so they are tenant-takeover-grade and should be rare and deliberate. The permission name is resolved from Microsoft Graph's own appRoles; an unresolved grant is reported not assessed, never passed. This rule matches only grants on the Microsoft Graph resource app.",
+  "selector": { "node_type": "role", "predicate": { "op": "and", "children": [
+    { "op": "fact_equals", "fact": "grant_type", "value": "application" },
+    { "op": "fact_equals", "fact": "resource_app_id", "value": "00000003-0000-0000-c000-000000000000" }
+  ] } },
+  "indeterminate": { "op": "fact_equals", "fact": "resolved", "value": "false" },
+  "predicate": { "op": "fact_in", "fact": "permission", "values": [
+    "RoleManagement.ReadWrite.Directory",
+    "Directory.ReadWrite.All",
+    "AppRoleAssignment.ReadWrite.All",
+    "Application.ReadWrite.All",
+    "PrivilegedAccess.ReadWrite.AzureAD",
+    "User.ReadWrite.All",
+    "Group.ReadWrite.All",
+    "DelegatedPermissionGrant.ReadWrite.All",
+    "Policy.ReadWrite.ConditionalAccess",
+    "UserAuthenticationMethod.ReadWrite.All",
+    "RoleManagementPolicy.ReadWrite.Directory",
+    "Sites.FullControl.All"
+  ] },
+  "requires": { "nodes": ["role"], "completeness": ["entra.appRoleAssignments"] },
+  "confidence": { "base": 85 }
+}

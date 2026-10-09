@@ -1,0 +1,29 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:ittcsecscan:schema:model:cut_set:v1",
+  "title": "Canonical cut set (minimum-cut remediation candidate)",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "changes", "paths_removed", "risk_reduction", "effort", "disruption"],
+  "properties": {
+    "schema_version": { "$ref": "urn:ittcsecscan:schema:model:common:v1#/$defs/schema_version" },
+    "changes": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["source", "target", "kind", "description"],
+        "properties": {
+          "source": { "$ref": "urn:ittcsecscan:schema:model:common:v1#/$defs/stable_id" },
+          "target": { "$ref": "urn:ittcsecscan:schema:model:common:v1#/$defs/stable_id" },
+          "kind": { "$ref": "urn:ittcsecscan:schema:model:common:v1#/$defs/edge_kind" },
+          "description": { "type": "string" }
+        }
+      }
+    },
+    "paths_removed": { "type": "integer", "minimum": 0 },
+    "risk_reduction": { "type": "integer", "minimum": 0 },
+    "effort": { "type": "integer", "minimum": 0 },
+    "disruption": { "type": "integer", "minimum": 0 }
+  }
+}

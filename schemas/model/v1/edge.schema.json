@@ -1,0 +1,20 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:ittcsecscan:schema:model:edge:v1",
+  "title": "Canonical edge (directed graph relationship)",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "source", "target", "kind", "deny_evaluated", "freshness", "confidence", "evidence", "explanation"],
+  "properties": {
+    "schema_version": { "$ref": "urn:ittcsecscan:schema:model:common:v1#/$defs/schema_version" },
+    "source": { "$ref": "urn:ittcsecscan:schema:model:common:v1#/$defs/stable_id" },
+    "target": { "$ref": "urn:ittcsecscan:schema:model:common:v1#/$defs/stable_id" },
+    "kind": { "$ref": "urn:ittcsecscan:schema:model:common:v1#/$defs/edge_kind" },
+    "conditions": { "type": "array", "items": { "$ref": "urn:ittcsecscan:schema:model:common:v1#/$defs/condition" } },
+    "deny_evaluated": { "$ref": "urn:ittcsecscan:schema:model:common:v1#/$defs/tri_state" },
+    "freshness": { "$ref": "urn:ittcsecscan:schema:model:common:v1#/$defs/freshness" },
+    "confidence": { "$ref": "urn:ittcsecscan:schema:model:common:v1#/$defs/confidence" },
+    "evidence": { "type": "array", "items": { "$ref": "urn:ittcsecscan:schema:model:common:v1#/$defs/evidence" } },
+    "explanation": { "type": "array", "items": { "type": "string" } }
+  }
+}

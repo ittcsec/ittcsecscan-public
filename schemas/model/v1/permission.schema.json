@@ -1,0 +1,17 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:ittcsecscan:schema:model:permission:v1",
+  "title": "Canonical permission grant",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "principal", "resource", "action", "effect"],
+  "properties": {
+    "schema_version": { "$ref": "urn:ittcsecscan:schema:model:common:v1#/$defs/schema_version" },
+    "principal": { "$ref": "urn:ittcsecscan:schema:model:common:v1#/$defs/stable_id" },
+    "resource": { "$ref": "urn:ittcsecscan:schema:model:common:v1#/$defs/stable_id" },
+    "action": { "type": "string" },
+    "effect": { "type": "string", "description": "vocabulary deferred (blocker B-5)" },
+    "condition": { "type": "array", "items": { "$ref": "urn:ittcsecscan:schema:model:common:v1#/$defs/condition" } },
+    "inherited_from": { "$ref": "urn:ittcsecscan:schema:model:common:v1#/$defs/stable_id" }
+  }
+}

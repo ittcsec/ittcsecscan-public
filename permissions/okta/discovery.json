@@ -1,0 +1,18 @@
+{
+  "schema_version": "permissions.v1",
+  "provider": "okta",
+  "profile": "discovery",
+  "verification": { "status": "unverified" },
+  "permissions": [
+    {
+      "permission": "okta.users.read",
+      "enabled_by": ["collector:okta.users", "collector:okta.groups"],
+      "verification": { "status": "unverified" }
+    },
+    {
+      "permission": "okta.groups.read",
+      "enabled_by": ["collector:okta.groups"],
+      "verification": { "status": "unverified" }
+    }
+  ]
+}

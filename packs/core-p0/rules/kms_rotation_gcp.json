@@ -1,0 +1,12 @@
+{
+  "id": "CORE-P0-KMS-ROTATION-GCP",
+  "version": "1",
+  "pack_id": "core-p0",
+  "severity": "medium",
+  "title": "Cloud KMS key has no rotation schedule",
+  "detail": "The Cloud KMS crypto key has no rotation period configured, so it is never rotated automatically.",
+  "selector": { "node_type": "control", "predicate": { "op": "fact_present", "fact": "rotation_configured" } },
+  "predicate": { "op": "fact_equals", "fact": "rotation_configured", "value": "false" },
+  "requires": { "nodes": ["control"], "completeness": ["cloudkms.cryptoKeys"] },
+  "confidence": { "base": 80 }
+}

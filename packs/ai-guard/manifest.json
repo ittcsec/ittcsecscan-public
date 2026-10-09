@@ -1,0 +1,30 @@
+{
+  "schema_version": 1,
+  "pack_id": "ai-guard",
+  "version": "1.0.0",
+  "engine_min": 1,
+  "engine_max": 1,
+  "providers": [
+    "aws"
+  ],
+  "domains": [
+    "ai agents"
+  ],
+  "rules": [
+    {
+      "id": "AIG-AGENT-EXCESSIVE-PRIVILEGE",
+      "file": "rules/ai_agent_excessive_privilege.json",
+      "digest": "9cf4ebffb57802a4bca37007d901657c810fe15d580ed12d5c350428487fa028"
+    },
+    {
+      "id": "AIG-TOOL-UNSAFE",
+      "file": "rules/ai_agent_unsafe_tool.json",
+      "digest": "069e9122c0ac073713afb85ea976ca4d1cf4a8681df7ba83ea5cdc3e273df4c5"
+    },
+    {
+      "id": "AIG-DATA-DANGEROUS",
+      "file": "rules/ai_agent_dangerous_data.json",
+      "digest": "484c93d72feae7b4e4a23f186dca2e3a04c5cd6ddbffac8b466f81a6d9f60ae9"
+    }
+  ]
+}

@@ -1,0 +1,13 @@
+{
+  "id": "IDH-GCP-SA-KEY-OLD",
+  "version": "1",
+  "pack_id": "identity-hygiene",
+  "severity": "medium",
+  "title": "User-managed service account key is old",
+  "detail": "A user-managed service account key is older than 90 days. User-managed keys are long-lived downloadable private keys and are the highest-risk GCP credential; they should be rotated regularly or replaced with keyless authentication. The 90-day threshold lives in this signed rule; the key age in days is a collected fact. A key whose age is undeterminable is reported not assessed, never passed.",
+  "selector": { "node_type": "credential", "predicate": { "op": "fact_equals", "fact": "key_type", "value": "user_managed" } },
+  "indeterminate": { "op": "not", "children": [ { "op": "fact_num", "fact": "key_age_days", "cmp": "ge", "value": "0" } ] },
+  "predicate": { "op": "fact_num", "fact": "key_age_days", "cmp": "gt", "value": "90" },
+  "requires": { "nodes": ["credential"], "completeness": ["iam.serviceAccountKeys"] },
+  "confidence": { "base": 80 }
+}

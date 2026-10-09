@@ -1,0 +1,123 @@
+{
+  "schema_version": "permissions.v1",
+  "provider": "azure",
+  "profile": "discovery",
+  "verification": { "status": "unverified" },
+  "permissions": [
+    {
+      "permission": "Application.Read.All",
+      "enabled_by": ["collector:azure.entra.identities", "collector:azure.entra.appCredentials", "collector:azure.entra.appRoleAssignments"],
+      "verification": { "status": "unverified" }
+    },
+    {
+      "permission": "Group.Read.All",
+      "enabled_by": ["collector:azure.entra.identities"],
+      "verification": { "status": "unverified" }
+    },
+    {
+      "permission": "User.Read.All",
+      "enabled_by": ["collector:azure.entra.identities"],
+      "verification": { "status": "unverified" }
+    },
+    {
+      "permission": "Policy.Read.All",
+      "enabled_by": ["collector:azure.entra.securityDefaults", "collector:azure.entra.conditionalAccess"],
+      "verification": { "status": "unverified" }
+    },
+    {
+      "permission": "Microsoft.Authorization/roleAssignments/read",
+      "enabled_by": ["collector:azure.rbac.assignments"],
+      "verification": { "status": "unverified" }
+    },
+    {
+      "permission": "Microsoft.Authorization/roleDefinitions/read",
+      "enabled_by": ["collector:azure.rbac.assignments"],
+      "verification": { "status": "unverified" }
+    },
+    {
+      "permission": "Microsoft.Authorization/denyAssignments/read",
+      "enabled_by": ["collector:azure.rbac.assignments"],
+      "verification": { "status": "unverified" }
+    },
+    {
+      "permission": "Microsoft.Storage/storageAccounts/read",
+      "enabled_by": ["collector:azure.storage.accounts"],
+      "verification": { "status": "unverified" }
+    },
+    {
+      "permission": "Microsoft.Compute/virtualMachines/read",
+      "enabled_by": ["collector:azure.compute.virtualmachines"],
+      "verification": { "status": "unverified" }
+    },
+    {
+      "permission": "Microsoft.Network/virtualNetworks/read",
+      "enabled_by": ["collector:azure.network"],
+      "verification": { "status": "unverified" }
+    },
+    {
+      "permission": "Microsoft.Network/networkSecurityGroups/read",
+      "enabled_by": ["collector:azure.network"],
+      "verification": { "status": "unverified" }
+    },
+    {
+      "permission": "Microsoft.Network/publicIPAddresses/read",
+      "enabled_by": ["collector:azure.network"],
+      "verification": { "status": "unverified" }
+    },
+    {
+      "permission": "Microsoft.Network/networkInterfaces/read",
+      "enabled_by": ["collector:azure.network"],
+      "verification": { "status": "unverified" }
+    },
+    {
+      "permission": "Microsoft.KeyVault/vaults/read",
+      "enabled_by": ["collector:azure.keyvault"],
+      "verification": { "status": "unverified" }
+    },
+    {
+      "permission": "Microsoft.Sql/servers/read",
+      "enabled_by": ["collector:azure.database"],
+      "verification": { "status": "unverified" }
+    },
+    {
+      "permission": "Microsoft.DBforPostgreSQL/flexibleServers/read",
+      "enabled_by": ["collector:azure.database"],
+      "verification": { "status": "unverified" }
+    },
+    {
+      "permission": "Microsoft.DBforMySQL/flexibleServers/read",
+      "enabled_by": ["collector:azure.database"],
+      "verification": { "status": "unverified" }
+    },
+    {
+      "permission": "Microsoft.DocumentDB/databaseAccounts/read",
+      "enabled_by": ["collector:azure.database"],
+      "verification": { "status": "unverified" }
+    },
+    {
+      "permission": "Microsoft.OperationalInsights/workspaces/read",
+      "enabled_by": ["collector:azure.logging"],
+      "verification": { "status": "unverified" }
+    },
+    {
+      "permission": "Microsoft.Insights/diagnosticSettings/read",
+      "enabled_by": ["collector:azure.logging"],
+      "verification": { "status": "unverified" }
+    },
+    {
+      "permission": "Microsoft.Security/pricings/read",
+      "enabled_by": ["collector:azure.defender"],
+      "verification": { "status": "unverified" }
+    },
+    {
+      "permission": "Microsoft.Security/autoProvisioningSettings/read",
+      "enabled_by": ["collector:azure.defender"],
+      "verification": { "status": "unverified" }
+    },
+    {
+      "permission": "Microsoft.Management/managementGroups/read",
+      "enabled_by": ["collector:azure.management.hierarchy"],
+      "verification": { "status": "unverified" }
+    }
+  ]
+}

@@ -1,0 +1,7 @@
+{
+  "schema_version": "permissions.v1",
+  "provider": "github",
+  "profile": "deep-evidence",
+  "verification": { "status": "unverified" },
+  "permissions": []
+}

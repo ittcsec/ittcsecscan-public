@@ -1,0 +1,15 @@
+{
+  "id": "CORE-P0-DATABASE-PUBLIC-GCP",
+  "version": "1",
+  "pack_id": "core-p0",
+  "severity": "high",
+  "title": "Cloud SQL is open to the public internet",
+  "detail": "The Cloud SQL instance has a public IP and an authorized-network entry of 0.0.0.0/0, so it accepts connections from any address on the internet.",
+  "selector": { "node_type": "data_store", "predicate": { "op": "fact_present", "fact": "public_ip_enabled" } },
+  "predicate": { "op": "and", "children": [
+    { "op": "fact_equals", "fact": "public_ip_enabled", "value": "true" },
+    { "op": "fact_contains", "fact": "authorized_networks", "value": "0.0.0.0/0" }
+  ] },
+  "requires": { "nodes": ["data_store"], "completeness": ["cloudsql.instances"] },
+  "confidence": { "base": 90 }
+}

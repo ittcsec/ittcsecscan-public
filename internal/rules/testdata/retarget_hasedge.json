@@ -1,0 +1,58 @@
+[
+  {
+    "rule": {
+      "rule_id": "TEST-STANDING-ADMIN",
+      "version": "1",
+      "pack_id": "test"
+    },
+    "entity_id": "user:alice",
+    "entity_type": "identity",
+    "state": "fail",
+    "confidence": 85,
+    "confidence_basis": [
+      "base(85)"
+    ],
+    "grounding": {
+      "nodes": [
+        "user:alice",
+        "role:Owner"
+      ],
+      "edges": [
+        "user:alice -[assumes]-\u003e role:Owner"
+      ],
+      "facts": [
+        "privilege=owner on role:Owner"
+      ],
+      "completeness": [
+        "rbac.roleAssignments:complete"
+      ]
+    },
+    "trace": [
+      "role role:Owner: fact privilege=\"owner\"",
+      "identity user:alice assumes/links via assumes to role role:Owner"
+    ]
+  },
+  {
+    "rule": {
+      "rule_id": "TEST-STANDING-ADMIN",
+      "version": "1",
+      "pack_id": "test"
+    },
+    "entity_id": "user:bob",
+    "entity_type": "identity",
+    "state": "pass",
+    "confidence": 85,
+    "confidence_basis": [
+      "base(85)"
+    ],
+    "grounding": {
+      "nodes": [
+        "user:bob"
+      ],
+      "completeness": [
+        "rbac.roleAssignments:complete"
+      ]
+    },
+    "trace": null
+  }
+]

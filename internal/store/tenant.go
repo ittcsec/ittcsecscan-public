@@ -1,0 +1,224 @@
+package store
+
+import (
+	"context"
+	"crypto/cipher"
+	"crypto/hmac"
+	"crypto/sha256"
+	"database/sql"
+	"encoding/hex"
+	"errors"
+	"hash"
+	"log/slog"
+	"strconv"
+	"sync"
+)
+
+// Tenant is one open tenant store, handed out by Store.Acquire. It stays
+// valid until its release function is called; after that, any use may return
+// ErrClosed once the pool closes it.
+//
+// Lock order: connMu before stateMu, never the reverse. Operations on the
+// keys hold stateMu for their whole duration, so close() can never wipe a key
+// in the middle of an encryption.
+type Tenant struct {
+	id TenantID
+	// sealHardStop and sealWarn are this tenant's data-key encryption limits
+	// (B-6), copied from the store when it is opened.
+	sealHardStop int64
+	sealWarn     int64
+	logger       *slog.Logger
+
+	connMu sync.Mutex // serialises use of the single connection
+	db     *sql.DB
+	conn   *sql.Conn
+
+	stateMu  sync.RWMutex // guards the keys, closed, and verified
+	dataKey  []byte
+	idKey    []byte
+	closed   bool
+	verified bool // opened through every check; only then does close write statistics
+}
+
+// ID returns the tenant this handle belongs to.
+func (t *Tenant) ID() TenantID { return t.id }
+
+// warnNearLimit logs, if the data key has reached the warn threshold, that it
+// must be rotated (B-6). The tenant ID is a random identifier, not customer
+// data, so it is safe to log.
+func (t *Tenant) warnNearLimit(count int64) {
+	if count < t.sealWarn {
+		return
+	}
+	t.logger.Warn("the tenant's data key is near its encryption limit; rotate the key",
+		"tenant", t.id.String(), "sealed", count, "warn", t.sealWarn, "hard_stop", t.sealHardStop)
+}
+
+// SealValue encrypts plaintext with the tenant's data key, bound to this
+// tenant, to field, and to row, the integer primary key of the row that holds
+// it (ADR-0013). The field is bound by its logical name, so renaming the
+// physical table or column never breaks decryption.
+func (t *Tenant) SealValue(f Field, row int64, plaintext []byte) ([]byte, error) {
+	var out []byte
+	err := t.withKeys(func(k *tenantKeys) error {
+		var err error
+		out, err = k.seal(f, row, plaintext)
+		return err
+	})
+	return out, err
+}
+
+// OpenValue decrypts a value sealed by SealValue. A value from another
+// tenant, field, or row fails with ErrKeyMismatch.
+func (t *Tenant) OpenValue(f Field, row int64, sealed []byte) ([]byte, error) {
+	var out []byte
+	err := t.withKeys(func(k *tenantKeys) error {
+		var err error
+		out, err = k.open(f, row, sealed)
+		return err
+	})
+	return out, err
+}
+
+// StableID derives the tenant-scoped stable ID of a provider-native
+// identifier, in hex: HMAC-SHA-256 under the tenant's stable-ID key. The same
+// native identifier gives unrelated IDs in different tenants.
+func (t *Tenant) StableID(nativeID string) (string, error) {
+	var id string
+	err := t.withKeys(func(k *tenantKeys) error {
+		id = hex.EncodeToString(k.stableID(nativeID))
+		return nil
+	})
+	return id, err
+}
+
+// withConn runs fn on the tenant's single hardened connection, one caller at
+// a time. fn may call the key methods above, or withKeys.
+func (t *Tenant) withConn(ctx context.Context, fn func(*sql.Conn) error) error {
+	t.connMu.Lock()
+	defer t.connMu.Unlock()
+	t.stateMu.RLock()
+	closed := t.closed
+	t.stateMu.RUnlock()
+	if closed {
+		return ErrClosed
+	}
+	if err := ctx.Err(); err != nil {
+		return err
+	}
+	return fn(t.conn)
+}
+
+// withKeys runs fn with the tenant's keys, which cannot be wiped until fn
+// returns. fn must not call the exported key methods.
+func (t *Tenant) withKeys(fn func(*tenantKeys) error) error {
+	t.stateMu.RLock()
+	defer t.stateMu.RUnlock()
+	if t.closed {
+		return ErrClosed
+	}
+	a, err := newAEAD(t.dataKey)
+	if err != nil {
+		return err
+	}
+	return fn(&tenantKeys{id: t.id.String(), aead: a, idKey: t.idKey})
+}
+
+// tenantKeys performs one tenant's key operations, reusing one cipher and
+// one MAC. It is valid only inside withKeys.
+type tenantKeys struct {
+	id    string
+	aead  cipher.AEAD
+	idKey []byte
+	mac   hash.Hash
+}
+
+// checkBinding refuses a value with no field, or with a row key that no row
+// can have: keys come from AUTOINCREMENT, so they start at 1.
+func checkBinding(f Field, row int64) error {
+	switch {
+	case f.name == "":
+		return errNoField
+	case row <= 0:
+		return errNoRow
+	}
+	return nil
+}
+
+func (k *tenantKeys) seal(f Field, row int64, plaintext []byte) ([]byte, error) {
+	if err := checkBinding(f, row); err != nil {
+		return nil, err
+	}
+	return k.aead.Seal(nil, nil, plaintext, k.valueAAD(f, row)), nil
+}
+
+func (k *tenantKeys) open(f Field, row int64, sealed []byte) ([]byte, error) {
+	if err := checkBinding(f, row); err != nil {
+		return nil, err
+	}
+	pt, err := k.aead.Open(nil, nil, sealed, k.valueAAD(f, row))
+	if err != nil {
+		return nil, ErrKeyMismatch
+	}
+	return pt, nil
+}
+
+func (k *tenantKeys) valueAAD(f Field, row int64) []byte {
+	return encodeFields(valueLabel, k.id, f.name, strconv.FormatInt(row, 10))
+}
+
+// mac returns HMAC-SHA-256, under the tenant's stable-ID key, of the label
+// and fields, unambiguously encoded.
+func (k *tenantKeys) sum(label string, fields ...string) []byte {
+	if k.mac == nil {
+		k.mac = hmac.New(sha256.New, k.idKey)
+	}
+	k.mac.Reset()
+	_, _ = k.mac.Write(encodeFields(label, fields...))
+	return k.mac.Sum(nil)
+}
+
+func (k *tenantKeys) stableID(nativeID string) []byte { return k.sum(stableIDLabel, nativeID) }
+
+// hash is the keyed hash of content for purpose p. It shares the stable-ID
+// key, separated from stable IDs and from other purposes by its label.
+func (k *tenantKeys) hash(p hashPurpose, fields ...string) []byte {
+	return k.sum(keyedHashLabel, append([]string{string(p)}, fields...)...)
+}
+
+// setKeys installs the unwrapped keys after verification.
+func (t *Tenant) setKeys(data, id []byte) {
+	t.stateMu.Lock()
+	defer t.stateMu.Unlock()
+	t.dataKey, t.idKey = data, id
+}
+
+// markVerified records that every open-time check passed.
+func (t *Tenant) markVerified() {
+	t.stateMu.Lock()
+	defer t.stateMu.Unlock()
+	t.verified = true
+}
+
+// close releases the connection and wipes the unwrapped keys. It waits for a
+// running withConn call and for key operations in progress. A tenant that
+// passed every open-time check first refreshes its statistics (ADR-0011 §4);
+// a refused file is never written to.
+func (t *Tenant) close() error {
+	t.connMu.Lock()
+	defer t.connMu.Unlock()
+	t.stateMu.Lock()
+	defer t.stateMu.Unlock()
+	if t.closed {
+		return nil
+	}
+	t.closed = true
+	clear(t.dataKey)
+	clear(t.idKey)
+	t.dataKey, t.idKey = nil, nil
+	var optimize error
+	if t.verified {
+		_, optimize = t.conn.ExecContext(context.Background(), "PRAGMA optimize")
+	}
+	return errors.Join(optimize, t.conn.Close(), t.db.Close())
+}

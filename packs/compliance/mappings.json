@@ -1,0 +1,188 @@
+{
+  "schema_version": 1,
+  "frameworks": [
+    { "framework": "ISO 27001", "version": "2022", "effective_date": "2022-10-25" },
+    { "framework": "SOC 2", "version": "TSC 2017 (rev. 2022)", "effective_date": "2022-12-15" },
+    { "framework": "GDPR", "version": "Regulation (EU) 2016/679", "effective_date": "2018-05-25" },
+    { "framework": "NIS2", "version": "Directive (EU) 2022/2555", "effective_date": "2024-10-17" },
+    { "framework": "DORA", "version": "Regulation (EU) 2022/2554", "effective_date": "2025-01-17" },
+    { "framework": "CRA", "version": "Regulation (EU) 2024/2847", "effective_date": "2027-12-11" }
+  ],
+  "rules": [
+    { "rule_id": "CORE-P0-STORAGE-PUBLIC-AWS", "controls": [
+      { "framework": "ISO 27001", "control": "A.8.3" },
+      { "framework": "ISO 27001", "control": "A.5.15" },
+      { "framework": "SOC 2", "control": "CC6.1" },
+      { "framework": "GDPR", "control": "Art.32" },
+      { "framework": "NIS2", "control": "Art.21(2)(i)" },
+      { "framework": "DORA", "control": "Art.9" },
+      { "framework": "CRA", "control": "Annex I.1(2)(d)" }
+    ] },
+    { "rule_id": "CORE-P0-STORAGE-PUBLIC-AZURE", "controls": [
+      { "framework": "ISO 27001", "control": "A.8.3" },
+      { "framework": "ISO 27001", "control": "A.5.15" },
+      { "framework": "SOC 2", "control": "CC6.1" },
+      { "framework": "GDPR", "control": "Art.32" },
+      { "framework": "NIS2", "control": "Art.21(2)(i)" },
+      { "framework": "DORA", "control": "Art.9" },
+      { "framework": "CRA", "control": "Annex I.1(2)(d)" }
+    ] },
+    { "rule_id": "CORE-P0-STORAGE-PUBLIC-GCP", "controls": [
+      { "framework": "ISO 27001", "control": "A.8.3" },
+      { "framework": "ISO 27001", "control": "A.5.15" },
+      { "framework": "SOC 2", "control": "CC6.1" },
+      { "framework": "GDPR", "control": "Art.32" },
+      { "framework": "NIS2", "control": "Art.21(2)(i)" },
+      { "framework": "DORA", "control": "Art.9" },
+      { "framework": "CRA", "control": "Annex I.1(2)(d)" }
+    ] },
+    { "rule_id": "CORE-P0-DATABASE-PUBLIC-AWS", "controls": [
+      { "framework": "ISO 27001", "control": "A.8.3" },
+      { "framework": "ISO 27001", "control": "A.5.15" },
+      { "framework": "SOC 2", "control": "CC6.1" },
+      { "framework": "GDPR", "control": "Art.32" },
+      { "framework": "NIS2", "control": "Art.21(2)(i)" },
+      { "framework": "DORA", "control": "Art.9" },
+      { "framework": "CRA", "control": "Annex I.1(2)(d)" }
+    ] },
+    { "rule_id": "CORE-P0-DATABASE-PUBLIC-AZURE", "controls": [
+      { "framework": "ISO 27001", "control": "A.8.3" },
+      { "framework": "ISO 27001", "control": "A.5.15" },
+      { "framework": "SOC 2", "control": "CC6.1" },
+      { "framework": "GDPR", "control": "Art.32" },
+      { "framework": "NIS2", "control": "Art.21(2)(i)" },
+      { "framework": "DORA", "control": "Art.9" },
+      { "framework": "CRA", "control": "Annex I.1(2)(d)" }
+    ] },
+    { "rule_id": "CORE-P0-DATABASE-PUBLIC-GCP", "controls": [
+      { "framework": "ISO 27001", "control": "A.8.3" },
+      { "framework": "ISO 27001", "control": "A.5.15" },
+      { "framework": "SOC 2", "control": "CC6.1" },
+      { "framework": "GDPR", "control": "Art.32" },
+      { "framework": "NIS2", "control": "Art.21(2)(i)" },
+      { "framework": "DORA", "control": "Art.9" },
+      { "framework": "CRA", "control": "Annex I.1(2)(d)" }
+    ] },
+    { "rule_id": "CORE-P0-COMPUTE-INTERNET-EXPOSED-AWS", "controls": [
+      { "framework": "ISO 27001", "control": "A.8.20" },
+      { "framework": "ISO 27001", "control": "A.8.22" },
+      { "framework": "SOC 2", "control": "CC6.6" },
+      { "framework": "GDPR", "control": "Art.32" },
+      { "framework": "NIS2", "control": "Art.21(2)(i)" },
+      { "framework": "DORA", "control": "Art.9" },
+      { "framework": "CRA", "control": "Annex I.1(2)(d)" }
+    ] },
+    { "rule_id": "CORE-P0-COMPUTE-INTERNET-EXPOSED-AZURE", "controls": [
+      { "framework": "ISO 27001", "control": "A.8.20" },
+      { "framework": "ISO 27001", "control": "A.8.22" },
+      { "framework": "SOC 2", "control": "CC6.6" },
+      { "framework": "GDPR", "control": "Art.32" },
+      { "framework": "NIS2", "control": "Art.21(2)(i)" },
+      { "framework": "DORA", "control": "Art.9" },
+      { "framework": "CRA", "control": "Annex I.1(2)(d)" }
+    ] },
+    { "rule_id": "CORE-P0-COMPUTE-INTERNET-EXPOSED-GCP", "controls": [
+      { "framework": "ISO 27001", "control": "A.8.20" },
+      { "framework": "ISO 27001", "control": "A.8.22" },
+      { "framework": "SOC 2", "control": "CC6.6" },
+      { "framework": "GDPR", "control": "Art.32" },
+      { "framework": "NIS2", "control": "Art.21(2)(i)" },
+      { "framework": "DORA", "control": "Art.9" },
+      { "framework": "CRA", "control": "Annex I.1(2)(d)" }
+    ] },
+    { "rule_id": "CORE-P0-KMS-ROTATION-AWS", "controls": [
+      { "framework": "ISO 27001", "control": "A.8.24" },
+      { "framework": "SOC 2", "control": "CC6.1" },
+      { "framework": "GDPR", "control": "Art.32" },
+      { "framework": "NIS2", "control": "Art.21(2)(h)" },
+      { "framework": "DORA", "control": "Art.9" },
+      { "framework": "CRA", "control": "Annex I.1(2)(e)" }
+    ] },
+    { "rule_id": "CORE-P0-KMS-ROTATION-GCP", "controls": [
+      { "framework": "ISO 27001", "control": "A.8.24" },
+      { "framework": "SOC 2", "control": "CC6.1" },
+      { "framework": "GDPR", "control": "Art.32" },
+      { "framework": "NIS2", "control": "Art.21(2)(h)" },
+      { "framework": "DORA", "control": "Art.9" },
+      { "framework": "CRA", "control": "Annex I.1(2)(e)" }
+    ] },
+    { "rule_id": "CORE-P0-KEYVAULT-PURGE-AZURE", "controls": [
+      { "framework": "ISO 27001", "control": "A.8.24" },
+      { "framework": "SOC 2", "control": "CC6.1" },
+      { "framework": "GDPR", "control": "Art.32" },
+      { "framework": "NIS2", "control": "Art.21(2)(h)" },
+      { "framework": "DORA", "control": "Art.9" },
+      { "framework": "CRA", "control": "Annex I.1(2)(e)" }
+    ] },
+    { "rule_id": "IDH-AWS-IAM-USER-NO-MFA", "controls": [
+      { "framework": "ISO 27001", "control": "A.8.5" },
+      { "framework": "SOC 2", "control": "CC6.1" },
+      { "framework": "GDPR", "control": "Art.32" },
+      { "framework": "NIS2", "control": "Art.21(2)(j)" },
+      { "framework": "DORA", "control": "Art.9" }
+    ] },
+    { "rule_id": "IDH-AWS-IAM-KEY-UNUSED", "controls": [
+      { "framework": "ISO 27001", "control": "A.8.2" },
+      { "framework": "ISO 27001", "control": "A.5.18" },
+      { "framework": "SOC 2", "control": "CC6.1" },
+      { "framework": "NIS2", "control": "Art.21(2)(i)" },
+      { "framework": "DORA", "control": "Art.9" }
+    ] },
+    { "rule_id": "IDH-AWS-IAM-KEY-UNROTATED", "controls": [
+      { "framework": "ISO 27001", "control": "A.8.5" },
+      { "framework": "ISO 27001", "control": "A.5.17" },
+      { "framework": "SOC 2", "control": "CC6.1" },
+      { "framework": "NIS2", "control": "Art.21(2)(i)" },
+      { "framework": "DORA", "control": "Art.9" }
+    ] },
+    { "rule_id": "IDH-AWS-ROOT-KEY-ACTIVE", "controls": [
+      { "framework": "ISO 27001", "control": "A.8.2" },
+      { "framework": "SOC 2", "control": "CC6.1" },
+      { "framework": "SOC 2", "control": "CC6.3" },
+      { "framework": "GDPR", "control": "Art.32" },
+      { "framework": "NIS2", "control": "Art.21(2)(i)" },
+      { "framework": "DORA", "control": "Art.9" }
+    ] },
+    { "rule_id": "IDH-AWS-ROOT-NO-MFA", "controls": [
+      { "framework": "ISO 27001", "control": "A.8.5" },
+      { "framework": "SOC 2", "control": "CC6.1" },
+      { "framework": "GDPR", "control": "Art.32" },
+      { "framework": "NIS2", "control": "Art.21(2)(j)" },
+      { "framework": "DORA", "control": "Art.9" }
+    ] },
+    { "rule_id": "IDH-AWS-ROLE-DORMANT", "controls": [
+      { "framework": "ISO 27001", "control": "A.5.18" },
+      { "framework": "ISO 27001", "control": "A.8.2" },
+      { "framework": "SOC 2", "control": "CC6.2" },
+      { "framework": "SOC 2", "control": "CC6.3" },
+      { "framework": "NIS2", "control": "Art.21(2)(i)" },
+      { "framework": "DORA", "control": "Art.9" }
+    ] },
+    { "rule_id": "IDH-AZURE-APP-CRED-EXPIRED", "controls": [
+      { "framework": "ISO 27001", "control": "A.8.5" },
+      { "framework": "SOC 2", "control": "CC6.1" }
+    ] },
+    { "rule_id": "IDH-AZURE-APP-CRED-LONG-LIFETIME", "controls": [
+      { "framework": "ISO 27001", "control": "A.8.5" },
+      { "framework": "ISO 27001", "control": "A.5.17" },
+      { "framework": "SOC 2", "control": "CC6.1" },
+      { "framework": "NIS2", "control": "Art.21(2)(i)" },
+      { "framework": "DORA", "control": "Art.9" }
+    ] },
+    { "rule_id": "IDH-AZURE-APP-HIGH-PRIV-GRANT", "controls": [
+      { "framework": "ISO 27001", "control": "A.8.2" },
+      { "framework": "SOC 2", "control": "CC6.1" },
+      { "framework": "SOC 2", "control": "CC6.3" },
+      { "framework": "GDPR", "control": "Art.32" },
+      { "framework": "NIS2", "control": "Art.21(2)(i)" },
+      { "framework": "DORA", "control": "Art.9" }
+    ] },
+    { "rule_id": "IDH-GCP-SA-KEY-OLD", "controls": [
+      { "framework": "ISO 27001", "control": "A.8.5" },
+      { "framework": "ISO 27001", "control": "A.5.17" },
+      { "framework": "SOC 2", "control": "CC6.1" },
+      { "framework": "NIS2", "control": "Art.21(2)(i)" },
+      { "framework": "DORA", "control": "Art.9" }
+    ] }
+  ]
+}

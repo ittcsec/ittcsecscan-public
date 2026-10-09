@@ -1,0 +1,17 @@
+{
+  "id": "CORE-P0-STORAGE-PUBLIC-GCP",
+  "version": "1",
+  "pack_id": "core-p0",
+  "severity": "high",
+  "title": "Cloud Storage bucket is publicly accessible",
+  "detail": "The bucket's IAM policy or legacy ACL grants access to allUsers or allAuthenticatedUsers, exposing its objects publicly.",
+  "selector": { "node_type": "data_store", "predicate": { "op": "fact_present", "fact": "storage_class" } },
+  "predicate": { "op": "or", "children": [
+    { "op": "fact_present", "fact": "iam_all_users_roles" },
+    { "op": "fact_present", "fact": "acl_all_users" }
+  ] },
+  "requires": { "nodes": ["data_store"], "completeness": ["storage.bucketIam"] },
+  "confidence": { "base": 80, "factors": [
+    { "name": "iam_all_users_binding", "when": { "op": "fact_present", "fact": "iam_all_users_roles" }, "delta": 15 }
+  ] }
+}

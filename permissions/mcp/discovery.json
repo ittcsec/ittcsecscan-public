@@ -1,0 +1,13 @@
+{
+  "schema_version": "permissions.v1",
+  "provider": "mcp",
+  "profile": "discovery",
+  "verification": { "status": "unverified" },
+  "permissions": [
+    {
+      "permission": "read:mcp-config",
+      "enabled_by": ["collector:mcp.servers"],
+      "verification": { "status": "unverified" }
+    }
+  ]
+}

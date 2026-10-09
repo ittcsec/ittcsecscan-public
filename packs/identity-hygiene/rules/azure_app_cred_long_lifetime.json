@@ -1,0 +1,13 @@
+{
+  "id": "IDH-AZURE-APP-CRED-LONG-LIFETIME",
+  "version": "1",
+  "pack_id": "identity-hygiene",
+  "severity": "medium",
+  "title": "App registration credential has an over-long lifetime",
+  "detail": "An Entra application registration credential was issued with a validity period longer than 730 days (2 years). Long credential lifetimes increase the window a leaked credential stays usable and work against regular rotation. The lifetime limit lives in this signed rule; the credential lifetime in days is a collected fact.",
+  "selector": { "node_type": "credential", "predicate": { "op": "fact_equals", "fact": "azure_type", "value": "app_credential" } },
+  "indeterminate": { "op": "not", "children": [ { "op": "fact_num", "fact": "credential_lifetime_days", "cmp": "ge", "value": "0" } ] },
+  "predicate": { "op": "fact_num", "fact": "credential_lifetime_days", "cmp": "gt", "value": "730" },
+  "requires": { "nodes": ["credential"], "completeness": ["entra.appCredentials"] },
+  "confidence": { "base": 75 }
+}

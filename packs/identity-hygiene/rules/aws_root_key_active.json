@@ -1,0 +1,19 @@
+{
+  "id": "IDH-AWS-ROOT-KEY-ACTIVE",
+  "version": "1",
+  "pack_id": "identity-hygiene",
+  "severity": "critical",
+  "title": "Root account has an active access key",
+  "detail": "The AWS account root user has an active access key. The root user has unrestricted access and its access keys cannot be scoped; AWS guidance is to have no root access keys. This reads the account credential report root row.",
+  "selector": { "node_type": "identity", "predicate": { "op": "fact_equals", "fact": "cred_user", "value": "<root_account>" } },
+  "indeterminate": { "op": "and", "children": [
+    { "op": "not", "children": [ { "op": "fact_present", "fact": "cred_access_key_1_active" } ] },
+    { "op": "not", "children": [ { "op": "fact_present", "fact": "cred_access_key_2_active" } ] }
+  ] },
+  "predicate": { "op": "or", "children": [
+    { "op": "fact_equals", "fact": "cred_access_key_1_active", "value": "true" },
+    { "op": "fact_equals", "fact": "cred_access_key_2_active", "value": "true" }
+  ] },
+  "requires": { "nodes": ["identity"], "completeness": ["iam.credentialReport"] },
+  "confidence": { "base": 95 }
+}

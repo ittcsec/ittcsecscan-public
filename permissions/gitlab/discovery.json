@@ -1,0 +1,13 @@
+{
+  "schema_version": "permissions.v1",
+  "provider": "gitlab",
+  "profile": "discovery",
+  "verification": { "status": "unverified" },
+  "permissions": [
+    {
+      "permission": "read_api",
+      "enabled_by": ["collector:gitlab.projects", "collector:gitlab.pipelines", "collector:gitlab.artifacts"],
+      "verification": { "status": "unverified" }
+    }
+  ]
+}

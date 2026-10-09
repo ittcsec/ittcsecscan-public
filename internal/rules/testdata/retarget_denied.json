@@ -1,0 +1,27 @@
+[
+  {
+    "rule": {
+      "rule_id": "TEST-STORAGE-PUBLIC",
+      "version": "1",
+      "pack_id": "test"
+    },
+    "entity_id": "//b/pub",
+    "entity_type": "data_store",
+    "state": "unknown",
+    "confidence": 0,
+    "confidence_basis": [
+      "storage.bucketIam:denied"
+    ],
+    "grounding": {
+      "nodes": [
+        "//b/pub"
+      ],
+      "completeness": [
+        "storage.bucketIam:denied"
+      ]
+    },
+    "trace": [
+      "data_store //b/pub: not assessed, required evidence incomplete (storage.bucketIam:denied)"
+    ]
+  }
+]

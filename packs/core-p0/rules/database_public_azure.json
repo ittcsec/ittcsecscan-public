@@ -1,0 +1,12 @@
+{
+  "id": "CORE-P0-DATABASE-PUBLIC-AZURE",
+  "version": "1",
+  "pack_id": "core-p0",
+  "severity": "high",
+  "title": "Managed database allows public network access",
+  "detail": "The Azure SQL, PostgreSQL, MySQL, or Cosmos database has public network access enabled, exposing its endpoint to the public internet.",
+  "selector": { "node_type": "data_store", "predicate": { "op": "fact_present", "fact": "engine" } },
+  "predicate": { "op": "fact_equals", "fact": "public_network_access", "value": "Enabled" },
+  "requires": { "nodes": ["data_store"], "completeness": ["database.sqlServers", "database.postgresqlServers", "database.mysqlServers", "database.cosmosAccounts"] },
+  "confidence": { "base": 85 }
+}

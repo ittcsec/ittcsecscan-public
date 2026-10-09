@@ -1,0 +1,55 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:ittcsecscan:schema:cli:overrides:v1",
+  "title": "ittcsecscan classify list --json output",
+  "description": "The business-criticality override audit history for a tenant, oldest first. Each entry is one appended, audited human decision; the latest entry for an entity is the effective override.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "tenant", "overrides"],
+  "properties": {
+    "schema_version": { "const": 1 },
+    "tenant": {
+      "description": "The tenant the overrides belong to.",
+      "type": "string",
+      "minLength": 26,
+      "maxLength": 26
+    },
+    "overrides": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["entity", "criticality", "actor", "at"],
+        "properties": {
+          "entity": {
+            "description": "The target entity's tenant-scoped stable id (64 lowercase hex).",
+            "type": "string",
+            "pattern": "^[0-9a-f]{64}$"
+          },
+          "resource": {
+            "description": "The entity's native id, resolved for readability. Absent when the entity is no longer present.",
+            "type": "string"
+          },
+          "criticality": {
+            "description": "The business-criticality level set by this override.",
+            "type": "integer",
+            "minimum": 1
+          },
+          "actor": {
+            "description": "Who set the override.",
+            "type": "string"
+          },
+          "reason": {
+            "description": "Why the override was set. Absent when none was given.",
+            "type": "string"
+          },
+          "at": {
+            "description": "When the override was set (RFC 3339, UTC).",
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,18 @@
+# Normalise line endings to LF everywhere. Embedded files (JSON Schemas) are
+# compiled into the binary, so CRLF checkouts on Windows would change release
+# hashes and break reproducible builds.
+* text=auto eol=lf
+
+*.ps1 text eol=crlf
+
+# Vendored dependencies are stored and checked out exactly as `go mod vendor`
+# produces them (LF), regardless of file type, so the local tree and Linux CI
+# agree and the vendor-consistency check stays stable. This overrides the *.ps1
+# rule above for vendored PowerShell test-resource files.
+vendor/** text=auto eol=lf
+
+*.png binary
+*.jpg binary
+*.pdf binary
+*.docx binary
+*.exe binary

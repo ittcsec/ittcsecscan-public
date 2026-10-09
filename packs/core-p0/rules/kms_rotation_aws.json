@@ -1,0 +1,12 @@
+{
+  "id": "CORE-P0-KMS-ROTATION-AWS",
+  "version": "1",
+  "pack_id": "core-p0",
+  "severity": "medium",
+  "title": "KMS key rotation is disabled",
+  "detail": "The customer-managed KMS key does not have automatic annual key rotation enabled.",
+  "selector": { "node_type": "control", "predicate": { "op": "fact_present", "fact": "rotation_enabled" } },
+  "predicate": { "op": "fact_equals", "fact": "rotation_enabled", "value": "false" },
+  "requires": { "nodes": ["control"], "completeness": ["kms.keyDetails"] },
+  "confidence": { "base": 85 }
+}
