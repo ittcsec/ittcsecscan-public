@@ -179,7 +179,7 @@ jobs:
         run: go test -run='^$' -fuzz="^${FN}\$" -fuzztime=60s "$PKG"
       - name: Keep failing inputs
         if: failure()
-        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
           name: fuzz-${{ matrix.target.fn }}
           path: "**/testdata/fuzz/**"
@@ -273,7 +273,7 @@ jobs:
               -main cmd/ittcsecscan -output "$RUNNER_TEMP/build-a/ittcsecscan_${goos}_${goarch}.cdx.json" .
           done
       - name: Upload release-preparation artefacts (unsigned)
-        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
           name: release-prep-unsigned
           path: ${{ runner.temp }}/build-a
