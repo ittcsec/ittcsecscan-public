@@ -1,3 +1,37 @@
+# v1.338.4 (2026-10-09.2)
+
+* **Dependency Update**: Update to smithy-go v1.28.5.
+* **Dependency Update**: Updated to the latest SDK module versions
+
+# v1.338.3 (2026-10-08)
+
+* **Dependency Update**: Update to smithy-go v1.28.4.
+* **Dependency Update**: Updated to the latest SDK module versions
+
+# v1.338.2 (2026-10-06)
+
+* No change notes available for this release.
+
+# v1.338.1 (2026-10-01)
+
+* **Documentation**: This release launches the AMI tag sharing feature, which lets AMI owners share tags alongside their AMIs, eliminating the need to build and maintain custom tag replication workflows.
+
+# v1.338.0 (2026-09-29)
+
+* **Feature**: Adds the LaunchStatus field to CapacityReservation in the DescribeCapacityReservations response. This field indicates whether you can currently launch instances into an UltraServer.
+
+# v1.337.0 (2026-09-28)
+
+* **Feature**: API changes to AWS Client VPN to support device posture assessment and Cedar authorization policies
+
+# v1.336.1 (2026-09-24)
+
+* **Dependency Update**: Updated to the latest SDK module versions
+
+# v1.336.0 (2026-09-22)
+
+* **Feature**: Amazon EC2 now supports quote-based start date changes for future-dated Capacity Reservations
+
 # v1.335.0 (2026-09-18)
 
 * **Feature**: This release adds documentation for the T8i instance family to the EC2 ModifyDefaultCreditSpecification and GetDefaultCreditSpecification APIs.
