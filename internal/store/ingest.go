@@ -142,11 +142,18 @@ func (t *Tenant) loadFirstScan(ctx context.Context, s firstScan) (int64, error) 
 		}
 		defer func() { err = errors.Join(err, restore()) }()
 		return t.withKeys(func(k *tenantKeys) error {
-			tx, err := c.BeginTx(ctx, nil)
+			// Non-cancellable to avoid the shared-connection rollback race; see
+			// the comment on BeginTx in (*Tenant).Update (repo.go).
+			tx, err := c.BeginTx(context.WithoutCancel(ctx), nil)
 			if err != nil {
 				return err
 			}
 			if scanID, err = writeFirstScan(ctx, tx, k, res, s); err != nil {
+				return errors.Join(err, tx.Rollback())
+			}
+			// The begin is non-cancellable, so roll back here if the caller
+			// cancelled, rather than committing a scan it tried to abort.
+			if err := ctx.Err(); err != nil {
 				return errors.Join(err, tx.Rollback())
 			}
 			if err := tx.Commit(); err != nil {

@@ -61,7 +61,9 @@ type querier interface {
 func (t *Tenant) loadGraph(ctx context.Context) (*graph, error) {
 	g := &graph{labels: map[uint32][]string{}}
 	err := t.withConn(ctx, func(c *sql.Conn) (err error) {
-		tx, err := c.BeginTx(ctx, &sql.TxOptions{ReadOnly: true})
+		// Non-cancellable to avoid the shared-connection rollback race; see
+		// the comment on BeginTx in (*Tenant).View (repo.go).
+		tx, err := c.BeginTx(context.WithoutCancel(ctx), &sql.TxOptions{ReadOnly: true})
 		if err != nil {
 			return err
 		}

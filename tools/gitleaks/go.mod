@@ -2,7 +2,7 @@ module github.com/ittcsec/ittcsecscan/tools/gitleaks
 
 go 1.27.0
 
-toolchain go1.27.1
+toolchain go1.27.2
 
 tool github.com/zricethezav/gitleaks/v8
 

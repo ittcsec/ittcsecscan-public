@@ -24,7 +24,7 @@ concurrency:
   cancel-in-progress: true
 
 env:
-  GO_VERSION: "1.27.1"
+  GO_VERSION: "1.27.2"
   GOTOOLCHAIN: local
   # The product module is vendored (ADR-0017): builds, tests, and the release
   # compile from vendor/, so the code that runs with the operator's cloud

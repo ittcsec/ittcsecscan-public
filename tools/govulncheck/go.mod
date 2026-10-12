@@ -2,7 +2,7 @@ module github.com/ittcsec/ittcsecscan/tools/govulncheck
 
 go 1.27.0
 
-toolchain go1.27.1
+toolchain go1.27.2
 
 tool golang.org/x/vuln/cmd/govulncheck
 

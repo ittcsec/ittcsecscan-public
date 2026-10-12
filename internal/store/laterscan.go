@@ -162,7 +162,9 @@ func (t *Tenant) planLaterScan(ctx context.Context, s laterScan) (*laterPlan, er
 	p := &laterPlan{nodeByPos: make([]int64, len(s.entities))}
 	err := t.withConn(ctx, func(c *sql.Conn) error {
 		return t.withKeys(func(k *tenantKeys) error {
-			tx, err := c.BeginTx(ctx, &sql.TxOptions{ReadOnly: true})
+			// Non-cancellable to avoid the shared-connection rollback race; see
+			// the comment on BeginTx in (*Tenant).View (repo.go).
+			tx, err := c.BeginTx(context.WithoutCancel(ctx), &sql.TxOptions{ReadOnly: true})
 			if err != nil {
 				return err
 			}
@@ -381,7 +383,9 @@ func (t *Tenant) applyLaterScan(ctx context.Context, s laterScan, p *laterPlan, 
 	var scanID int64
 	err := t.withConn(ctx, func(c *sql.Conn) error {
 		return t.withKeys(func(k *tenantKeys) error {
-			tx, err := c.BeginTx(ctx, nil)
+			// Non-cancellable to avoid the shared-connection rollback race; see
+			// the comment on BeginTx in (*Tenant).Update (repo.go).
+			tx, err := c.BeginTx(context.WithoutCancel(ctx), nil)
 			if err != nil {
 				return err
 			}

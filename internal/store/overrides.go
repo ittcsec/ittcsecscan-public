@@ -37,7 +37,9 @@ func (t *Tenant) AddCriticalityOverride(ctx context.Context, ov model.Criticalit
 	}
 	return t.withConn(ctx, func(c *sql.Conn) error {
 		return t.withKeys(func(k *tenantKeys) (err error) {
-			tx, err := c.BeginTx(ctx, nil)
+			// Non-cancellable to avoid the shared-connection rollback race; see
+			// the comment on BeginTx in (*Tenant).Update (repo.go).
+			tx, err := c.BeginTx(context.WithoutCancel(ctx), nil)
 			if err != nil {
 				return err
 			}
@@ -69,6 +71,11 @@ func (t *Tenant) AddCriticalityOverride(ctx context.Context, ov model.Criticalit
 				id, k.id, sid, ov.Criticality, actorSealed, reasonSealed, ov.At.UnixMilli()); err != nil {
 				return err
 			}
+			// The begin is non-cancellable, so roll back on a late cancel rather
+			// than committing. committed is still false, so the defer rolls back.
+			if err = ctx.Err(); err != nil {
+				return err
+			}
 			if err = tx.Commit(); err != nil {
 				return err
 			}
@@ -85,7 +92,9 @@ func (t *Tenant) CriticalityOverrides(ctx context.Context) ([]model.CriticalityO
 	var out []model.CriticalityOverride
 	err := t.withConn(ctx, func(c *sql.Conn) error {
 		return t.withKeys(func(k *tenantKeys) (err error) {
-			tx, err := c.BeginTx(ctx, &sql.TxOptions{ReadOnly: true})
+			// Non-cancellable to avoid the shared-connection rollback race; see
+			// the comment on BeginTx in (*Tenant).View (repo.go).
+			tx, err := c.BeginTx(context.WithoutCancel(ctx), &sql.TxOptions{ReadOnly: true})
 			if err != nil {
 				return err
 			}

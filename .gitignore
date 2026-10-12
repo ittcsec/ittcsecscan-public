@@ -1,0 +1,28 @@
+# Pinned tool binaries (tools/install.sh), release output (release/build.sh),
+# and release/sign.sh's temporary rebuild folders
+/bin/
+/dist/
+/.release-work.*/
+
+# Go test, build, and coverage artefacts
+*.test
+*.exe
+*.out
+/coverage*
+
+# Local configuration and data must never be committed
+config.json
+!/internal/config/testdata/**
+*.db
+*.sqlite
+*.sqlite3
+# Frozen release schema fixtures are checked in on purpose (ADR-0012 §4): they are
+# synthetic-data tenant files the released-fixture rollback tests consume.
+!/internal/store/testdata/releases/**
+
+# Editors and OS files
+.idea/
+.vscode/
+*.swp
+.DS_Store
+Thumbs.db

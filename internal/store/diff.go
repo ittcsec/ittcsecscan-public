@@ -65,7 +65,9 @@ func (t *Tenant) Diff(ctx context.Context, scanID int64) (Diff, error) {
 	d := Diff{}
 	err := t.withConn(ctx, func(c *sql.Conn) error {
 		return t.withKeys(func(k *tenantKeys) (err error) {
-			tx, err := c.BeginTx(ctx, &sql.TxOptions{ReadOnly: true})
+			// Non-cancellable to avoid the shared-connection rollback race; see
+			// the comment on BeginTx in (*Tenant).View (repo.go).
+			tx, err := c.BeginTx(context.WithoutCancel(ctx), &sql.TxOptions{ReadOnly: true})
 			if err != nil {
 				return err
 			}

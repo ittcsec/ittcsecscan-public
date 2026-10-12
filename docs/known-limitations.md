@@ -296,6 +296,16 @@ than guessing it.
   warm-up acquire in the test so the first-open cost is not counted, give this test a larger
   `AcquireWait`, or scope `acquireWait` to the wait-for-slot rather than the connection/KDF setup
   (the last changes production semantics and needs its own review). A re-run of the CI job clears it.
+- **Migration transaction begins on a cancellable context (STORE-TXCANCEL-1).** Every live tenant
+  operation now begins its transaction under `context.WithoutCancel(ctx)` so a cancelled context
+  cannot leave `database/sql`'s asynchronous rollback racing the next operation on the tenant's
+  single shared connection (the cause of an intermittent "cannot start a transaction within a
+  transaction"). One begin is deliberately left on the plain `ctx`: `applyMigration` in
+  `internal/store/migrate.go` (`c.BeginTx(ctx, nil)`). It runs on the open path, before the tenant
+  is handed out, so a cancel mid-migration fails the open and the connection is never reused as a
+  live tenant, making the race unreachable there; the adjacent foreign-key re-enable already uses
+  `context.WithoutCancel`. Aligning the migration begin for consistency is a named follow-up, not a
+  correctness gap.
 - **Permission-matrix drift check (HARDEN-1).** `docs/permission-matrix.md` is a hand-maintained,
   human-readable view of the checked-in `permissions/*/discovery.json` templates (the authoritative,
   CI-reconciled source). Today nothing enforces that the document and the templates agree: the
@@ -399,6 +409,15 @@ than guessing it.
   hosted update endpoint and no pinned root are shipped yet, so `update check` requires both
   `--repo` and `--root` and `internal/update` points nowhere by default (inert by design). That
   wiring is tracked with UP-1 (hosting) and the updater remains inert until it lands.
+- **Uncalled dependency vulnerability in x/crypto (DEPVULN-1).** `govulncheck` reports one
+  advisory, GO-2026-5932, in a required module, `golang.org/x/crypto` (currently v0.57.0). The
+  scanner does not call the affected symbol, so govulncheck records it under "modules you
+  require ... your code doesn't appear to call" and still reports your code as affected by 0
+  vulnerabilities; it does not affect the shipped binary. As of 2026-10-10 no fixed x/crypto
+  release exists (the advisory lists "Fixed in: N/A"), so there is nothing to bump to yet. This
+  is recorded so that one uncalled finding in a govulncheck run is expected, not a regression.
+  Re-check on each dependency bump and whenever the advisory is updated; once a fixed version
+  ships, raise x/crypto past it and delete this note.
 
 ## Operating posture
 

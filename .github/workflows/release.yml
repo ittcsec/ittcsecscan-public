@@ -52,7 +52,7 @@ concurrency:
   cancel-in-progress: false
 
 env:
-  GO_VERSION: "1.27.1"
+  GO_VERSION: "1.27.2"
   GOTOOLCHAIN: local
   # The product module is vendored (ADR-0017): the release builds from vendor/.
   GOFLAGS: -mod=vendor

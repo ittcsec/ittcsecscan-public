@@ -62,7 +62,7 @@ These rules are enforced by `.golangci.yml` wherever a linter can enforce them:
 
 ## Local checks
 
-Install Go 1.27.1 (the version pinned by `go.mod`), then build the pinned
+Install Go 1.27.2 (the version pinned by `go.mod`), then build the pinned
 tools once:
 
 ```sh

@@ -63,7 +63,9 @@ func (t *Tenant) reserveSeals(ctx context.Context, n int64) (*reservation, error
 	res := &reservation{}
 	var committed int64 // the count after this reservation commits
 	err := t.withConn(ctx, func(c *sql.Conn) error {
-		tx, err := c.BeginTx(ctx, nil)
+		// Non-cancellable to avoid the shared-connection rollback race; see
+		// the comment on BeginTx in (*Tenant).Update (repo.go).
+		tx, err := c.BeginTx(context.WithoutCancel(ctx), nil)
 		if err != nil {
 			return err
 		}
@@ -82,6 +84,11 @@ func (t *Tenant) reserveSeals(ctx context.Context, n int64) (*reservation, error
 		res.balance = n
 		res.nearLimit = count < t.sealWarn && count+n >= t.sealWarn
 		committed = count + n
+		// The begin is non-cancellable, so roll back on a late cancel rather
+		// than committing a reservation the caller tried to abort.
+		if err := ctx.Err(); err != nil {
+			return errors.Join(err, tx.Rollback())
+		}
 		return tx.Commit()
 	})
 	if err != nil {

@@ -6,6 +6,7 @@ import (
 	"encoding/json"
 	"errors"
 	"maps"
+	"runtime"
 	"strings"
 	"testing"
 
@@ -151,6 +152,51 @@ func TestUpdateRollsBackOnFailure(t *testing.T) {
 		}()
 		assertDefault(t, tn)
 	})
+}
+
+// TestUpdateCancelDoesNotPoisonConnection is the regression guard for the
+// cancelled-transaction bug fixed in View/Update: a cancelled Update must fully
+// roll its transaction back on the tenant's single shared connection before it
+// returns, so the next operation can open its own transaction on that same
+// connection. Before the fix, database/sql spawned its own goroutine to roll
+// the transaction back when the context was cancelled; that asynchronous
+// rollback raced the explicit synchronous Rollback, database/sql could hand the
+// connection to the next operation before the driver-level ROLLBACK finished,
+// and the follow-up BeginTx failed with "cannot start a transaction within a
+// transaction". The failure is a data race, so it is reliable only under the
+// race detector: this test runs the cancel-then-read cycle many times on one
+// tenant to widen the window, and CI's -race job is the authoritative check.
+func TestUpdateCancelDoesNotPoisonConnection(t *testing.T) {
+	s, _ := newTestStore(t)
+	tn := acquire(t, s, createTenant(t, s))
+	for i := 0; i < 2000; i++ {
+		ctx, cancel := context.WithCancel(context.Background())
+		err := tn.Update(ctx, func(w repo.Writer) error {
+			if err := w.Settings().SetDisplayName(ctx, "temporary"); err != nil {
+				return err
+			}
+			cancel() // cancel after the write, before the commit
+			// Yield so database/sql's context-cancellation goroutine can start
+			// its asynchronous rollback before this function returns. Without the
+			// fix that async rollback then races the shared connection's reuse
+			// below; the yield plus many iterations widens the window so the
+			// race detector surfaces it.
+			runtime.Gosched()
+			return nil
+		})
+		if err == nil {
+			t.Fatalf("iteration %d: a cancelled update was committed", i)
+		}
+		// Reuse the shared connection immediately. Before the fix this begin
+		// could hit the in-flight async rollback and fail with the nested-
+		// transaction error; two begins per iteration widen the window. The
+		// cancelled write must also have rolled back, so the name is the default.
+		for r := 0; r < 2; r++ {
+			if got := readSettings(t, tn); got.DisplayName != "" {
+				t.Fatalf("iteration %d: cancelled update was not rolled back: %+v", i, got)
+			}
+		}
+	}
 }
 
 // Tags and attributes round-trip through the entity reader as distinct maps

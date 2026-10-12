@@ -19,7 +19,15 @@ import (
 func (t *Tenant) View(ctx context.Context, fn func(repo.Reader) error) error {
 	return t.withConn(ctx, func(c *sql.Conn) error {
 		return t.withKeys(func(k *tenantKeys) (err error) {
-			tx, err := c.BeginTx(ctx, &sql.TxOptions{ReadOnly: true})
+			// Begin with a non-cancellable context so database/sql does not spawn
+			// its own goroutine to roll the transaction back when ctx is cancelled.
+			// That asynchronous rollback races this function's own synchronous
+			// Rollback on the tenant's single shared connection: database/sql can
+			// release the connection before the driver-level ROLLBACK finishes, and
+			// the next operation's BeginTx then fails with "cannot start a
+			// transaction within a transaction". Cancellation is still honoured, by
+			// the queries, which run under the cancellable ctx via repoView.
+			tx, err := c.BeginTx(context.WithoutCancel(ctx), &sql.TxOptions{ReadOnly: true})
 			if err != nil {
 				return err
 			}
@@ -39,7 +47,15 @@ func (t *Tenant) View(ctx context.Context, fn func(repo.Reader) error) error {
 func (t *Tenant) Update(ctx context.Context, fn func(repo.Writer) error) error {
 	return t.withConn(ctx, func(c *sql.Conn) error {
 		return t.withKeys(func(k *tenantKeys) error {
-			tx, err := c.BeginTx(ctx, nil)
+			// Begin with a non-cancellable context: database/sql would otherwise
+			// roll this transaction back from its own goroutine when ctx is
+			// cancelled, racing the explicit Rollback below on the tenant's single
+			// shared connection and leaving a half-closed transaction behind, so
+			// the next BeginTx on that connection fails with "cannot start a
+			// transaction within a transaction". We handle cancellation ourselves,
+			// synchronously (the ctx.Err() check rolls back before returning), and
+			// the queries inside fn still run under the cancellable ctx.
+			tx, err := c.BeginTx(context.WithoutCancel(ctx), nil)
 			if err != nil {
 				return err
 			}

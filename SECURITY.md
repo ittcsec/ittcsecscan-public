@@ -76,11 +76,6 @@ research. Research is in accordance with this policy when you:
 - **report promptly and keep the issue confidential** until disclosure has been
   agreed with us.
 
-These conditions mirror the safeguards ittcsecscan applies to its own active
-validation: owned or explicitly authorised systems only, non-destructive probes,
-and no persistence, credential extraction, denial of service, or access to data
-contents.
-
 This policy covers ittcsecscan only. We cannot authorise testing of third-party
 systems, including the AWS, Azure, and Google Cloud platforms you may scan with
 it; follow their own security-testing policies. If you are unsure whether an

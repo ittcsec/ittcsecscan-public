@@ -14,8 +14,8 @@ everything it collects local.
 - **Explains the fix** for each finding, with exact steps, and never changes your cloud on its own.
 - **Is honest**: if it could not check something (for example, access was denied), it says so. It
   never guesses, and never reports a guess as a fact.
-- **Keeps your data local**: everything it collects is stored, encrypted, on your machine. Nothing
-  is sent to any server.
+- **Keeps your data local**: everything it collects is stored, encrypted, on your machine. Your
+  scan results never leave your machine.
 
 ## Supported clouds and the read-only guarantee
 
@@ -76,25 +76,19 @@ downloaded against `SHA256SUMS`. If it does not print success, do not run the bi
 ./ittcsecscan keys init
 ```
 
-2. **Scan** a cloud you are logged in to, and create a new local record for it:
-
-```bash
-./ittcsecscan scan --create
-```
-
-It prints a tenant id and writes an encrypted record on your machine.
-
-3. **Get the report**. A report folder is written next to the binary in several formats (HTML,
-   JSON, SARIF, PDF, and Word). Open the HTML file in your browser:
+2. **Scan and write the report.** This creates a new local record for a cloud you are logged in to,
+   scans it, and writes the report next to the binary in every format (HTML, JSON, SARIF, PDF, and
+   Word):
 
 ```bash
 ./ittcsecscan scan --create --report-dir ./ittcsecscan-report
 ```
 
-Every report starts with what was and was not checked, then lists findings worst first, each with
-why it matters and how to fix it. Use the tenant id with other commands (for example `fix` to see
-remediation steps, or `classify` to mark business-critical assets) to work with the same record
-again.
+It prints a tenant id and stores an encrypted record on your machine. Open the HTML file in your
+browser: every report starts with what was and was not checked, then lists findings worst first,
+each with why it matters and how to fix it. Use that tenant id with other commands (for example
+`fix` to see remediation steps, or `classify` to mark business-critical assets) to work with the
+same record again.
 
 ## Honest limitations
 
@@ -105,6 +99,10 @@ again.
   and Google Cloud rules are reported as not applicable rather than as passes.
 - **Honest gaps.** When access is denied, a service is unavailable, or data cannot be fully read,
   the result is reported as a gap or as unknown, never as a pass.
+- **One optional network call.** The only network use beyond reading your cloud's APIs is an
+  optional update check, off unless you pass its `--repo` and `--root` options; it fetches public
+  release metadata over HTTPS with an anonymous request and sends no scan data, credentials, or
+  inventory.
 
 ## Reporting a security problem
 
