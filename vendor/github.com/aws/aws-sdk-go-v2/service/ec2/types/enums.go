@@ -1399,6 +1399,28 @@ func (CapacityManagerStatus) Values() []CapacityManagerStatus {
 	}
 }
 
+type CapacityReservationAdjustmentStatus string
+
+// Enum values for CapacityReservationAdjustmentStatus
+const (
+	CapacityReservationAdjustmentStatusRequested CapacityReservationAdjustmentStatus = "requested"
+	CapacityReservationAdjustmentStatusApplied   CapacityReservationAdjustmentStatus = "applied"
+	CapacityReservationAdjustmentStatusRejected  CapacityReservationAdjustmentStatus = "rejected"
+)
+
+// Values returns all known values for CapacityReservationAdjustmentStatus. Note
+// that this can be expanded in the future, and so it is only as up to date as the
+// client.
+//
+// The ordering of this slice is not guaranteed to be stable across updates.
+func (CapacityReservationAdjustmentStatus) Values() []CapacityReservationAdjustmentStatus {
+	return []CapacityReservationAdjustmentStatus{
+		"requested",
+		"applied",
+		"rejected",
+	}
+}
+
 type CapacityReservationBillingRequestStatus string
 
 // Enum values for CapacityReservationBillingRequestStatus
@@ -1552,6 +1574,46 @@ func (CapacityReservationInstancePlatform) Values() []CapacityReservationInstanc
 		"RHEL with HA and SQL Server Standard",
 		"RHEL with HA and SQL Server Enterprise",
 		"Ubuntu Pro",
+	}
+}
+
+type CapacityReservationLaunchStatus string
+
+// Enum values for CapacityReservationLaunchStatus
+const (
+	CapacityReservationLaunchStatusLaunchable   CapacityReservationLaunchStatus = "launchable"
+	CapacityReservationLaunchStatusUnlaunchable CapacityReservationLaunchStatus = "unlaunchable"
+)
+
+// Values returns all known values for CapacityReservationLaunchStatus. Note that
+// this can be expanded in the future, and so it is only as up to date as the
+// client.
+//
+// The ordering of this slice is not guaranteed to be stable across updates.
+func (CapacityReservationLaunchStatus) Values() []CapacityReservationLaunchStatus {
+	return []CapacityReservationLaunchStatus{
+		"launchable",
+		"unlaunchable",
+	}
+}
+
+type CapacityReservationModificationQuoteState string
+
+// Enum values for CapacityReservationModificationQuoteState
+const (
+	CapacityReservationModificationQuoteStateActive  CapacityReservationModificationQuoteState = "active"
+	CapacityReservationModificationQuoteStateExpired CapacityReservationModificationQuoteState = "expired"
+)
+
+// Values returns all known values for CapacityReservationModificationQuoteState.
+// Note that this can be expanded in the future, and so it is only as up to date as
+// the client.
+//
+// The ordering of this slice is not guaranteed to be stable across updates.
+func (CapacityReservationModificationQuoteState) Values() []CapacityReservationModificationQuoteState {
+	return []CapacityReservationModificationQuoteState{
+		"active",
+		"expired",
 	}
 }
 
@@ -1758,6 +1820,52 @@ func (ClientVpnAuthenticationType) Values() []ClientVpnAuthenticationType {
 	}
 }
 
+type ClientVpnAuthorizationPolicyShadowMode string
+
+// Enum values for ClientVpnAuthorizationPolicyShadowMode
+const (
+	ClientVpnAuthorizationPolicyShadowModeEnabled  ClientVpnAuthorizationPolicyShadowMode = "enabled"
+	ClientVpnAuthorizationPolicyShadowModeDisabled ClientVpnAuthorizationPolicyShadowMode = "disabled"
+)
+
+// Values returns all known values for ClientVpnAuthorizationPolicyShadowMode.
+// Note that this can be expanded in the future, and so it is only as up to date as
+// the client.
+//
+// The ordering of this slice is not guaranteed to be stable across updates.
+func (ClientVpnAuthorizationPolicyShadowMode) Values() []ClientVpnAuthorizationPolicyShadowMode {
+	return []ClientVpnAuthorizationPolicyShadowMode{
+		"enabled",
+		"disabled",
+	}
+}
+
+type ClientVpnAuthorizationPolicyStatus string
+
+// Enum values for ClientVpnAuthorizationPolicyStatus
+const (
+	ClientVpnAuthorizationPolicyStatusCreating ClientVpnAuthorizationPolicyStatus = "creating"
+	ClientVpnAuthorizationPolicyStatusUpdating ClientVpnAuthorizationPolicyStatus = "updating"
+	ClientVpnAuthorizationPolicyStatusActive   ClientVpnAuthorizationPolicyStatus = "active"
+	ClientVpnAuthorizationPolicyStatusFailed   ClientVpnAuthorizationPolicyStatus = "failed"
+	ClientVpnAuthorizationPolicyStatusDeleting ClientVpnAuthorizationPolicyStatus = "deleting"
+)
+
+// Values returns all known values for ClientVpnAuthorizationPolicyStatus. Note
+// that this can be expanded in the future, and so it is only as up to date as the
+// client.
+//
+// The ordering of this slice is not guaranteed to be stable across updates.
+func (ClientVpnAuthorizationPolicyStatus) Values() []ClientVpnAuthorizationPolicyStatus {
+	return []ClientVpnAuthorizationPolicyStatus{
+		"creating",
+		"updating",
+		"active",
+		"failed",
+		"deleting",
+	}
+}
+
 type ClientVpnAuthorizationRuleStatusCode string
 
 // Enum values for ClientVpnAuthorizationRuleStatusCode
@@ -1803,6 +1911,28 @@ func (ClientVpnConnectionStatusCode) Values() []ClientVpnConnectionStatusCode {
 		"failed-to-terminate",
 		"terminating",
 		"terminated",
+	}
+}
+
+type ClientVpnDeviceTrustProviderType string
+
+// Enum values for ClientVpnDeviceTrustProviderType
+const (
+	ClientVpnDeviceTrustProviderTypeCrowdstrike ClientVpnDeviceTrustProviderType = "crowdstrike"
+	ClientVpnDeviceTrustProviderTypeJamf        ClientVpnDeviceTrustProviderType = "jamf"
+	ClientVpnDeviceTrustProviderTypeJumpcloud   ClientVpnDeviceTrustProviderType = "jumpcloud"
+)
+
+// Values returns all known values for ClientVpnDeviceTrustProviderType. Note that
+// this can be expanded in the future, and so it is only as up to date as the
+// client.
+//
+// The ordering of this slice is not guaranteed to be stable across updates.
+func (ClientVpnDeviceTrustProviderType) Values() []ClientVpnDeviceTrustProviderType {
+	return []ClientVpnDeviceTrustProviderType{
+		"crowdstrike",
+		"jamf",
+		"jumpcloud",
 	}
 }
 
@@ -7479,15 +7609,18 @@ type IpamInternetRegistryAssociationState string
 
 // Enum values for IpamInternetRegistryAssociationState
 const (
-	IpamInternetRegistryAssociationStatePendingEnable    IpamInternetRegistryAssociationState = "pending-enable"
-	IpamInternetRegistryAssociationStateCreateInProgress IpamInternetRegistryAssociationState = "create-in-progress"
-	IpamInternetRegistryAssociationStateCreateFailed     IpamInternetRegistryAssociationState = "create-failed"
-	IpamInternetRegistryAssociationStateEnableInProgress IpamInternetRegistryAssociationState = "enable-in-progress"
-	IpamInternetRegistryAssociationStateEnableComplete   IpamInternetRegistryAssociationState = "enable-complete"
-	IpamInternetRegistryAssociationStateEnableFailed     IpamInternetRegistryAssociationState = "enable-failed"
-	IpamInternetRegistryAssociationStateDeleteInProgress IpamInternetRegistryAssociationState = "delete-in-progress"
-	IpamInternetRegistryAssociationStateDeleteComplete   IpamInternetRegistryAssociationState = "delete-complete"
-	IpamInternetRegistryAssociationStateDeleteFailed     IpamInternetRegistryAssociationState = "delete-failed"
+	IpamInternetRegistryAssociationStatePendingEnable     IpamInternetRegistryAssociationState = "pending-enable"
+	IpamInternetRegistryAssociationStateCreateInProgress  IpamInternetRegistryAssociationState = "create-in-progress"
+	IpamInternetRegistryAssociationStateCreateFailed      IpamInternetRegistryAssociationState = "create-failed"
+	IpamInternetRegistryAssociationStateEnableInProgress  IpamInternetRegistryAssociationState = "enable-in-progress"
+	IpamInternetRegistryAssociationStateEnableComplete    IpamInternetRegistryAssociationState = "enable-complete"
+	IpamInternetRegistryAssociationStateEnableFailed      IpamInternetRegistryAssociationState = "enable-failed"
+	IpamInternetRegistryAssociationStateDisableInProgress IpamInternetRegistryAssociationState = "disable-in-progress"
+	IpamInternetRegistryAssociationStateDisableComplete   IpamInternetRegistryAssociationState = "disable-complete"
+	IpamInternetRegistryAssociationStateDisableFailed     IpamInternetRegistryAssociationState = "disable-failed"
+	IpamInternetRegistryAssociationStateDeleteInProgress  IpamInternetRegistryAssociationState = "delete-in-progress"
+	IpamInternetRegistryAssociationStateDeleteComplete    IpamInternetRegistryAssociationState = "delete-complete"
+	IpamInternetRegistryAssociationStateDeleteFailed      IpamInternetRegistryAssociationState = "delete-failed"
 )
 
 // Values returns all known values for IpamInternetRegistryAssociationState. Note
@@ -7503,6 +7636,9 @@ func (IpamInternetRegistryAssociationState) Values() []IpamInternetRegistryAssoc
 		"enable-in-progress",
 		"enable-complete",
 		"enable-failed",
+		"disable-in-progress",
+		"disable-complete",
+		"disable-failed",
 		"delete-in-progress",
 		"delete-complete",
 		"delete-failed",
@@ -10676,6 +10812,7 @@ const (
 	ResourceTypeIpamPoolAllocation                                     ResourceType = "ipam-pool-allocation"
 	ResourceTypeCapacityReservationCancellationQuote                   ResourceType = "capacity-reservation-cancellation-quote"
 	ResourceTypeApplicationStatusCheck                                 ResourceType = "application-status-check"
+	ResourceTypeCapacityReservationModificationQuote                   ResourceType = "capacity-reservation-modification-quote"
 )
 
 // Values returns all known values for ResourceType. Note that this can be
@@ -10795,6 +10932,7 @@ func (ResourceType) Values() []ResourceType {
 		"ipam-pool-allocation",
 		"capacity-reservation-cancellation-quote",
 		"application-status-check",
+		"capacity-reservation-modification-quote",
 	}
 }
 
@@ -10829,6 +10967,7 @@ const (
 	RirApnic  Rir = "apnic"
 	RirArin   Rir = "arin"
 	RirLacnic Rir = "lacnic"
+	RirNicbr  Rir = "nicbr"
 )
 
 // Values returns all known values for Rir. Note that this can be expanded in the
@@ -10841,6 +10980,7 @@ func (Rir) Values() []Rir {
 		"apnic",
 		"arin",
 		"lacnic",
+		"nicbr",
 	}
 }
 
