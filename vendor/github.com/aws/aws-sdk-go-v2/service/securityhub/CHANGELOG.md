@@ -1,3 +1,22 @@
+# v1.84.1 (2026-10-09.2)
+
+* **Dependency Update**: Update to smithy-go v1.28.5.
+* **Dependency Update**: Updated to the latest SDK module versions
+
+# v1.84.0 (2026-10-08)
+
+* **Feature**: Release findings export APIs - StartExportJobV2, GetExportJobV2, ListExportJobsV2, and CancelExportJobV2. This supports exporting findings from AWS Security Hub to Amazon S3 bucket.
+* **Dependency Update**: Update to smithy-go v1.28.4.
+* **Dependency Update**: Updated to the latest SDK module versions
+
+# v1.83.1 (2026-10-06)
+
+* No change notes available for this release.
+
+# v1.83.0 (2026-10-01)
+
+* **Feature**: Adds GetRemediationsV2 and ListExposuresByRemediationV2 APIs. This feature allows customers to see their highest priority remediations for their Exposure findings. Remediations target key changes customers can make to resources to drive finding resolution.
+
 # v1.82.1 (2026-09-24)
 
 * **Dependency Update**: Updated to the latest SDK module versions
